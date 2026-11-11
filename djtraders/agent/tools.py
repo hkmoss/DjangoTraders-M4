@@ -514,8 +514,43 @@ def customers_like_this_one(customer, arguments):
     details=_similarity_details(customer.company_name) to ToolResult so the answer's
     "Under the hood" table shows how similar the compared customers were.
     """
-    return ToolResult("This tool is not built yet. It is your job in Assignment 4.")
+    everyone = recommendations.all_order_lines()
+    on_sale = recommendations.on_sale_names()
 
+    frame = similar_customers.suggestions_for(
+        customer.company_name,
+        everyone,
+        on_sale,
+    )
+
+    if frame.empty:
+        return ToolResult(
+            "No products were found from similar customers.",
+            details=_similarity_details(customer.company_name),
+        )
+
+    return ToolResult(
+        f"{len(frame)} products are bought by customers with similar purchasing patterns. "
+        "Products are ordered by how many similar customers bought them; ties are broken by rarity, "
+        "so products bought by fewer customers overall come first. These are patterns to try, "
+        "not guarantees of what this customer will buy.",
+        columns=[
+            ("Product", "text"),
+            ("Bought By", "text"),
+            ("Similar Customers", "percent"),
+            ("All Customers", "percent"),
+        ],
+        rows=[
+            [
+                row["product_name"],
+                f'{int(row["bought_by"])} of {int(row["neighbours"])}',
+                row["share"],
+                row["overall"],
+            ]
+            for _, row in frame.iterrows()
+        ],
+        details=_similarity_details(customer.company_name),
+    )
 
 def slowing_customers(customer, arguments):
     """
@@ -527,8 +562,78 @@ def slowing_customers(customer, arguments):
     customers with at least 5 orders and a gap above zero, and at least arguments["gaps"] gaps overdue;
     show the 10 most overdue. This tool looks across customers, so the page's customer is not used.
     """
-    return ToolResult("This tool is not built yet. It is your job in Assignment 4.")
+    everyone = recommendations.all_order_lines()
 
+    orders = (
+        everyone[["customer_name", "order_id", "order_date"]]
+        .drop_duplicates()
+    )
+
+    rows = []
+    as_of = buy_again.latest_order_date()
+
+    for name, group in orders.groupby("customer_name"):
+        when = group["order_date"].sort_values()
+
+        if len(when) < 5:
+            continue
+
+        usual = when.diff().dt.days.dropna().median()
+
+        if usual <= 0:
+            continue
+
+        since = (as_of - when.iloc[-1]).days
+        overdue = since / usual
+
+        if overdue < arguments["gaps"]:
+            continue
+
+        rows.append(
+            (
+                name,
+                len(when),
+                usual,
+                since,
+                overdue,
+            )
+        )
+
+    frame = pd.DataFrame(
+        rows,
+        columns=[
+            "customer_name",
+            "orders",
+            "usual_days",
+            "days_since",
+            "overdue",
+        ],
+    )
+
+    frame = frame.sort_values("overdue", ascending=False).head(10)
+
+    return ToolResult(
+    f"{len(frame)} customers are ordering less often than their usual pattern. "
+    "Customers are ordered by how many usual gaps have passed since their last order. "
+    "The usual gap is a guide to who to call, not a forecast.",
+    columns=[
+        ("Customer", "text"),
+        ("Orders", "number"),
+        ("Usual Gap", "number"),
+        ("Days Since Last", "number"),
+        ("Gaps Overdue", "number"),
+    ],
+    rows=[
+        [
+            row["customer_name"],
+            int(row["orders"]),
+            round(row["usual_days"], 1),
+            int(row["days_since"]),
+            round(row["overdue"], 2),
+        ]
+        for _, row in frame.iterrows()
+    ],
+)
 
 def prepare_me_for_a_call(customer, arguments):
     """Employee tool: the call brief. The language model gathers what it needs and writes; see call_brief.py."""
