@@ -1,0 +1,64 @@
+{# Catalog card: the registry's enabled tools (tool_groups), grouped by technique. Each tool has an example question to click, a Run button when it needs no typing, and how it works. #}
+<div class="dt-card h-100">
+    <h5 class="dt-card-title">
+Tools the Assistant May Use
+    </h5>
+    <div class="dt-subtle mb-2">Click an example to put it in the question box, or press Run.</div>
+    <div class="dt-subtle mb-2"><strong>Where the AI is:</strong> a language model reads a typed question, chooses the tools and writes the answer, and can explain a result or draft a note from it. The tools themselves are Python functions; some use machine learning.</div>
+
+    <div class="dt-catalog-scroll">
+        {% for group in tool_groups %}
+            <section class="mb-3" aria-labelledby="group-{{ forloop.counter }}">
+                <h6 id="group-{{ forloop.counter }}" class="mb-0">{{ group.name }}</h6>
+                <div class="dt-subtle mb-1">{{ group.blurb }}</div>
+                
+                <ul class="list-unstyled mb-0">
+                    {% for tool in group.tools %}
+                        <li class="border-top border-bg-secondary-subtle border-2  pb-2 mb-2">
+                            <div>
+                                <i class="fa-solid {{ tool.icon }} me-1" aria-hidden="true"></i><code>{{ tool.name }}</code>
+                                {% if tool.learning %}
+                                    <span class="badge text-bg-success">{{ tool.learning }}</span>
+                                {% endif %}
+                                {% if "customer" not in tool.roles %}
+                                    <span class="badge text-bg-info" title="Only an employee can use this tool">employee only</span>
+                                {% endif %}
+                            </div>
+                            <div class="dt-subtle mb-2">{{ tool.description }}</div>
+
+                            <button type="button"
+                                    class="btn btn-link btn-sm p-0 text-start ask-example dt-hover-shadow p-2 rounded-2"
+                                    data-example="{{ tool.example }}"
+                                    title="Put this question in the box">
+                                <i class="fa-solid fa-comment-dots me-1" aria-hidden="true"></i>
+                                {{ tool.example }}
+                            </button>
+                            {% if not tool.needs_input %}
+                                <button type="button" class="btn btn-sm dt-btn-secondary-customer dt-hover-shadow ask-tool mt-1"
+                                        data-tool="{{ tool.name }}"
+                                        data-url="{% url 'djtraders:customer_ask_answer' customer.customer_id %}"
+                                        title="Run {{ tool.name }} with its default arguments">
+                                    <i class="fa-solid fa-play me-1" aria-hidden="true"></i>Run
+                                </button>
+                            {% endif %}
+                            {% if tool.method %}
+                                <details class="mt-2">
+                                    <summary class="dt-subtle">How it works</summary>
+
+                                    <div class="dt-subtle">
+                                        <strong>How:</strong> {{ tool.method }}
+                                    </div>
+
+                                    <div class="dt-subtle">
+                                        <strong>Code:</strong> <code>{{ tool.where }}</code>
+                                    </div>
+
+                                </details>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endfor %}
+    </div>
+</div>

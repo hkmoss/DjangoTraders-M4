@@ -1,0 +1,29 @@
+{# The AI's text: the last stage of the Tool Calls card whenever a language model wrote. ai is a dict with "sent" (the messages sent), "text" (what came back), "check" (writer.check_text) and "note" (why there is no text). #}
+<li class="mb-3">
+    <span class="dt-actor dt-actor-ai">AI</span> <strong>The language model wrote the answer</strong>
+    {% if ai.model %}<div class="dt-subtle">Model: <code>{{ ai.model }}</code></div>{% endif %}
+    <details class="mt-1">
+        <summary class="dt-subtle">Everything that was sent to the model</summary>
+        {% for message in ai.sent %}
+            <div class="small mt-2">{% include "djtraders/customers/_customer_assistant_message_label.html" %}</div>
+            {% if message.content %}<pre class="dt-ai-sent">{{ message.content }}</pre>{% endif %}
+        {% endfor %}
+    </details>
+    {% if ai.note %}
+        <div class="text-danger small mt-1" role="alert">No text came back: {{ ai.note }}.</div>
+    {% elif ai.check %}
+        <div class="mt-2">
+            <span class="dt-actor dt-actor-code">Our code</span> <strong>The check</strong>
+        </div>
+        {% if ai.check.unmatched %}
+            <div class="dt-check dt-check-flagged mt-1" role="status">
+                <i class="fa-solid fa-triangle-exclamation me-1" aria-hidden="true"></i>Not in the tool results: {{ ai.check.unmatched|join:", " }}
+            </div>
+        {% else %}
+            <div class="dt-check dt-check-ok mt-1" role="status">
+                <i class="fa-solid fa-circle-check me-1" aria-hidden="true"></i>{{ ai.check.numbers }} numbers, {{ ai.check.products }} product names: all in the tool results
+            </div>
+        {% endif %}
+        <div class="dt-subtle mt-1">It confirms where each figure came from, not whether the reading is fair.</div>
+    {% endif %}
+</li>

@@ -1,0 +1,144 @@
+<!--
+    Page shell for one customer (customer_detail view): the header plus a
+    Bootstrap tab control. Each tab's content is a partial fetched by AJAX the
+    first time the tab is shown (ActivatePageTabs and LoadPageTab, DjangoTraders.js):
+      Dashboard     -> _customer_dashboard.html, the default tab
+      Recommendations -> _customer_recommendations.html
+      Customer Info -> _customer_info.html
+      Order History -> _customer_orders.html
+      Ask           -> _customer_assistant_tab.html, only when can_ask (an employee or the customer's own login)
+    "Back to Customers" is hidden for a logged-in customer, since customer_list sends them to this page.
+-->
+{% extends "common/base.html" %}
+{% block title %}{{ customer.company_name }}{% endblock %}
+{% block content %}
+    <div class="dt-navbar my-3">
+        <div class="d-flex align-items-center">
+            <h1 class="h4 mb-0">
+                {{ customer.company_name }}
+                {% if customer.inactive_date %}
+                    <span class="badge dt-status-inactive">
+                        <i class="fa-solid fa-user-slash"></i> Inactive
+                    </span>
+                {% endif %}
+            </h1>
+        </div>
+        <div class="d-flex">
+            {% if not current_customer %}
+                <div class="dt-link-wrap btn dt-btn-secondary-customer dt-hover-shadow">
+                    <a href="{% url 'djtraders:customer_list' %}" title="Back to Customers">
+                        <i class="fa-solid fa-arrow-left me-1"></i>
+                        Back to Customers
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <ul class="nav nav-tabs gap-2 mb-3" id="customer-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link dt-tab dt-tab-customer active"
+                    id="dashboard-tab"
+                    type="button"
+                    role="tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#dashboard-pane"
+                    aria-controls="dashboard-pane"
+                    aria-selected="true"
+                    data-url="{% url 'djtraders:customer_dashboard' customer.customer_id %}">
+                <i class="fa-solid fa-chart-column dt-tab-icon me-1"></i> Dashboard
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link dt-tab dt-tab-customer"
+                    id="recommendations-tab"
+                    type="button"
+                    role="tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#recommendations-pane"
+                    aria-controls="recommendations-pane"
+                    aria-selected="false"
+                    data-url="{% url 'djtraders:customer_recommendations' customer.customer_id %}">
+                <i class="fa-solid fa-thumbs-up dt-tab-icon me-1"></i> Recommendations
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link dt-tab dt-tab-employee"
+                    id="info-tab"
+                    type="button"
+                    role="tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#info-pane"
+                    aria-controls="info-pane"
+                    aria-selected="false"
+                    data-url="{% url 'djtraders:customer_info' customer.customer_id %}">
+                <i class="fa-solid fa-address-card dt-tab-icon me-1"></i> Customer Info
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link dt-tab dt-tab-order"
+                    id="orders-tab"
+                    type="button"
+                    role="tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#orders-pane"
+                    aria-controls="orders-pane"
+                    aria-selected="false"
+                    data-url="{% url 'djtraders:customer_orders' customer.customer_id %}">
+                <i class="fa-solid fa-clock-rotate-left dt-tab-icon me-1"></i> Order History
+            </button>
+        </li>
+        {% if can_ask %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link dt-tab dt-tab-supplier"
+                        id="ask-tab"
+                        type="button"
+                        role="tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#ask-pane"
+                        aria-controls="ask-pane"
+                        aria-selected="false"
+                        data-url="{% url 'djtraders:customer_ask' customer.customer_id %}">
+                    <i class="fa-solid fa-comments dt-tab-icon me-1"></i> Ask
+                </button>
+            </li>
+        {% endif %}
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade show active"
+             id="dashboard-pane"
+             role="tabpanel"
+             aria-labelledby="dashboard-tab"
+             tabindex="0"></div>
+        <div class="tab-pane fade"
+             id="recommendations-pane"
+             role="tabpanel"
+             aria-labelledby="recommendations-tab"
+             tabindex="0"></div>
+        <div class="tab-pane fade"
+             id="info-pane"
+             role="tabpanel"
+             aria-labelledby="info-tab"
+             tabindex="0"></div>
+        <div class="tab-pane fade"
+             id="orders-pane"
+             role="tabpanel"
+             aria-labelledby="orders-tab"
+             tabindex="0"></div>
+        {% if can_ask %}
+            <div class="tab-pane fade"
+                 id="ask-pane"
+                 role="tabpanel"
+                 aria-labelledby="ask-tab"
+                 tabindex="0"></div>
+        {% endif %}
+    </div>
+{% endblock %}
+{% block scripts %}
+    {# plotly.js loads once here; each chart fragment only contains the small script that draws it. #}
+    <script src="https://cdn.plot.ly/plotly-4.1.1.min.js" charset="utf-8"></script>
+    <script>
+        $(function() {
+            ActivatePageTabs('#customer-tabs');
+        });
+    </script>
+{% endblock %}

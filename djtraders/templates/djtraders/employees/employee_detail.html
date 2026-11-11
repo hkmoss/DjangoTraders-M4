@@ -1,0 +1,87 @@
+<!--
+    Page shell for one employee (employee_detail view), built like customer_detail.html: a tab control whose
+    content is fetched by AJAX the first time each tab is shown.
+      Dashboard     -> _employee_dashboard.html, the default tab
+      Employee Info -> _employee_info.html
+      Employees     -> _employee_list.html, shown to managers only
+-->
+{% extends "common/base.html" %}
+
+{% block title %}{{ employee.first_name }} {{ employee.last_name }}{% endblock %}
+
+{% block content %}
+    <div class="dt-navbar my-3">
+        <div class="d-flex align-items-center">
+            <h1 class="h4 mb-0">
+                {% if current_employee.employee_id == employee.employee_id %}Welcome, {% endif %}{{ employee.first_name }} {{ employee.last_name }}
+            </h1>
+        </div>
+
+        <div class="d-flex">
+            <div class="dt-link-wrap btn dt-btn-primary-customer dt-hover-shadow">
+                <a href="{% url 'djtraders:customer_list' %}" title="View Customers">
+                    <i class="fa-solid fa-users me-1"></i>
+                    Customers
+                </a>
+            </div>
+            <div class="dt-link-wrap btn dt-btn-primary-supplier dt-hover-shadow">
+                <a href="{% url 'djtraders:product_list' %}" title="View Products">
+                    <i class="fa-solid fa-box-open me-1"></i>
+                    Products
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs gap-2 mb-3" id="employee-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link dt-tab dt-tab-employee active" id="dashboard-tab" type="button" role="tab"
+                    data-bs-toggle="tab" data-bs-target="#dashboard-pane"
+                    aria-controls="dashboard-pane" aria-selected="true"
+                    data-url="{% url 'djtraders:employee_dashboard' employee.employee_id %}">
+                <i class="fa-solid fa-chart-column dt-tab-icon me-1"></i> Dashboard
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link dt-tab dt-tab-customer" id="info-tab" type="button" role="tab"
+                    data-bs-toggle="tab" data-bs-target="#info-pane"
+                    aria-controls="info-pane" aria-selected="false"
+                    data-url="{% url 'djtraders:employee_info' employee.employee_id %}">
+                <i class="fa-solid fa-address-card dt-tab-icon me-1"></i> Employee Info
+            </button>
+        </li>
+        {# Only a manager (Employee.is_manager) gets the Employees tab; employee_list also refuses anyone else. #}
+        {% if current_employee.is_manager %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link dt-tab dt-tab-supplier" id="employees-tab" type="button" role="tab"
+                        data-bs-toggle="tab" data-bs-target="#employees-pane"
+                        aria-controls="employees-pane" aria-selected="false"
+                        data-url="{% url 'djtraders:employee_list' employee.employee_id %}">
+                    <i class="fa-solid fa-people-group dt-tab-icon me-1"></i> Employees
+                </button>
+            </li>
+        {% endif %}
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="dashboard-pane" role="tabpanel"
+             aria-labelledby="dashboard-tab" tabindex="0"></div>
+        <div class="tab-pane fade" id="info-pane" role="tabpanel"
+             aria-labelledby="info-tab" tabindex="0"></div>
+        {% if current_employee.is_manager %}
+            <div class="tab-pane fade" id="employees-pane" role="tabpanel"
+                 aria-labelledby="employees-tab" tabindex="0"></div>
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {# plotly.js loads once here; each chart fragment only contains the small script that draws it. #}
+    <script src="https://cdn.plot.ly/plotly-4.1.1.min.js" charset="utf-8"></script>
+    <script>
+        $(function() {
+            ActivatePageTabs('#employee-tabs');
+        });
+    </script>
+{% endblock %}

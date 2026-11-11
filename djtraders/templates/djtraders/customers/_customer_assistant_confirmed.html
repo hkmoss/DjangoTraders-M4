@@ -1,0 +1,5 @@
+{# Partial for the confirm form's place -- customer_ask_confirm view. #}
+<div class="alert alert-success py-2 mb-0">
+    Added {{ quantity }} &times; {{ product.product_name }} to your cart.
+    <a href="{% url 'djtraders:order_build' customer.customer_id %}" title="Open the cart to review it">Review your cart</a>
+</div>

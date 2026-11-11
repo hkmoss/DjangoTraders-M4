@@ -1,0 +1,125 @@
+<!--
+    The djtraders home page: no data of its own, just links into the app. Products is open to every visitor; the
+    second row shows Customers once an employee or customer is logged in, a supplier's own page link for a
+    supplier, or the three login cards when nobody is.
+-->
+{% extends "common/base.html" %}
+
+{% block title %}
+DJ Traders
+{% endblock title %}
+
+{% block content %}
+    <div class="text-center py-3">
+        <h1 class="mb-3">
+Welcome to DJ Traders
+        </h1>
+
+        <div class="lead text-muted mx-auto dt-lead-narrow">
+            This is the djTraders app - the primary application to manage customers and products for DjangoTraders.
+
+            Products are open to browse for everyone; log in as a customer or an employee for more.
+        </div>
+    </div>
+
+
+        {# Row 1: Products -- the one link open to every visitor, so it's the primary/default path in. #}
+    <div class="row m-3 g-3 justify-content-center">
+        <div class="col-md-3">
+            <div class="dt-card dt-link-wrap dt-hover-shadow text-center">
+                <a href="{% url 'djtraders:product_list' %}">
+                    <i class="fa-solid fa-box-open fa-2x dt-icon-supplier mb-2"></i>
+                    <h5>
+Products
+                    </h5>
+                    <div>
+Browse the full list of products on record.
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+        {# Row 2: Customers once logged in, or the two logins as alternatives when not. #}
+    <div class="row m-3 g-3 justify-content-center">
+        {% if current_employee or current_customer %}
+            <div class="col-md-3">
+                <div class="dt-card dt-link-wrap dt-hover-shadow text-center">
+                    <a href="{% url 'djtraders:customer_list' %}">
+                        <i class="fa-solid fa-users fa-2x dt-icon mb-2"></i>
+                        <h5>
+Customers
+                        </h5>
+                        <div>
+                            Browse the full list of customers on record.
+                        </div>
+                    </a>
+                </div>
+            </div>
+        {% elif current_supplier %}
+            <div class="col-md-3">
+                <div class="dt-card dt-link-wrap dt-hover-shadow text-center">
+                    <a href="{% url 'djtraders:supplier_me' %}">
+                        <i class="fa-solid fa-truck-field fa-2x dt-icon-supplier mb-2"></i>
+                        <h5>
+My Supplier Page
+                        </h5>
+                        <div>
+                            View your orders and product revenue.
+                        </div>
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-md-3">
+                <div class="dt-card dt-link-wrap dt-hover-shadow text-center">
+                    <a href="{% url 'djtraders:customer_login' %}"
+                       title="Log in as a customer">
+                        <i class="fa-solid fa-user-lock fa-2x dt-icon mb-2"></i>
+                        <h5>
+Customer Login
+                        </h5>
+                        <div>
+                            Log in to view and manage your own account.
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="dt-card dt-link-wrap dt-hover-shadow text-center">
+                    <a href="{% url 'djtraders:login' %}" title="Log in as an employee">
+                        <i class="fa-solid fa-user-lock fa-2x dt-icon-employee mb-2"></i>
+                        <h5>
+Employee Login
+                        </h5>
+                        <div>
+                            Log in to browse and manage every customer.
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="dt-card dt-link-wrap dt-hover-shadow text-center">
+                    <a href="{% url 'djtraders:supplier_login' %}"
+                       title="Log in as a supplier">
+                        <i class="fa-solid fa-user-lock fa-2x dt-icon-supplier mb-2"></i>
+                        <h5>
+Supplier Login
+                        </h5>
+                        <div>
+                            Log in to see your products' orders and revenue.
+                        </div>
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="dt-card dt-subtle text-center mx-auto my-4 w-50">
+        Use the cards above to get started, whether that's browsing
+        products or logging in, as the app grows more features over
+        the course of the semester.
+    </div>
+{% endblock content %}

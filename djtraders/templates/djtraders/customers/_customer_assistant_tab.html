@@ -1,0 +1,25 @@
+{# Partial (no base.html) for the Ask tab -- customer_ask view. Three columns on a wide screen: the catalog of tools on the left, the question box and the answer in the middle, and how the answer was made on the right. ActivateAskBox (agent.js) sends the form and fills #ask-answer and #ask-pipeline. #}
+<div class="row g-3 mb-3">
+    <div class="col-lg-5 order-lg-2">
+        {% include "djtraders/customers/_customer_assistant_question_box.html" %}
+        <div id="ask-answer" class="mt-3" aria-live="polite"></div>
+    </div>
+    <div class="col-lg-4 order-lg-3">
+        <div id="ask-pipeline">
+            <div class="dt-card">
+                <h5 class="dt-card-title">How the assistant answers</h5>
+                <div class="dt-subtle mb-2">Ask something and each stage fills in here.</div>
+                <ol class="mb-0 ps-3">
+                    <li class="mb-1"><strong>Your question</strong>, as you typed it, or the button you pressed.</li>
+                    <li class="mb-1"><strong>The tools.</strong> With a language model set up, the model reads your question and asks for the tools it needs; without one, the assistant scores every tool against your words and picks one.</li>
+                    <li class="mb-1"><strong>Checks.</strong> Every tool must be in the registry for you and its arguments in range, whoever chose it. The customer comes from the login, never from the question or the model.</li>
+                    <li class="mb-1"><strong>The tools run.</strong> Each shows its method and where to read its code.</li>
+                    <li class="mb-1"><strong>The AI's text.</strong> When the model writes, you see what it was sent, what it wrote, and the check of every number and product name against what the tools returned.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 order-lg-1">
+        {% include "djtraders/customers/_customer_assistant_tool_catalog.html" %}
+    </div>
+</div>

@@ -1,0 +1,42 @@
+{# Partial (no base.html) for the Details modal's contents -- employee_period_detail. Loaded into #revenue-modal-content, so it supplies the modal's header, body and footer. #}
+{% load humanize %}
+<div class="modal-header">
+    <h5 class="modal-title mb-0">{{ detail.label }}</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <div class="row text-center mb-3">
+        <div class="col-6">
+            <div class="dt-subtle">Revenue</div>
+            <div class="fs-4 fw-bold">${{ detail.revenue|floatformat:0|intcomma }}</div>
+        </div>
+        <div class="col-6">
+            <div class="dt-subtle">Orders</div>
+            <div class="fs-4 fw-bold">{{ detail.orders|intcomma }}</div>
+        </div>
+    </div>
+    {# A whole year also gets its revenue by month, drawn by Employee.period_detail. #}
+    {% if detail.months_plot %}
+        {{ detail.months_plot|safe }}
+    {% endif %}
+    <h6>Top products</h6>
+    <table class="table table-sm align-middle mb-0">
+        <thead>
+            <tr><th>Product</th><th class="text-end">Units</th><th class="text-end">Revenue</th></tr>
+        </thead>
+        <tbody>
+            {% for product in detail.products %}
+                <tr>
+                    <td>{{ product.product_name }}</td>
+                    <td class="text-end">{{ product.units|intcomma }}</td>
+                    <td class="text-end">${{ product.revenue|floatformat:0|intcomma }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="3" class="dt-subtle">No orders in this period.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

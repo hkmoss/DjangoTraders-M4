@@ -1,0 +1,18 @@
+{# Bought Together card: choosing a product sends it to customer_pairs_chart; ActivatePairsDropdown (customers.js) puts the chart that comes back into #pairs-chart. #}
+<div class="dt-card h-100">
+    <h5 class="dt-card-title">Bought Together</h5>
+    <nav class="dt-controls">
+        <div class="dt-control-group">
+            <label for="pairs-product" class="fw-bold mb-0">Product</label>
+            <select id="pairs-product"
+                    class="form-select w-auto"
+                    data-url="{% url 'djtraders:customer_pairs_chart' customer.customer_id %}">
+                {% for name in pair_products %}
+                    <option value="{{ name }}"{% if name == start_product %} selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </nav>
+    <div id="pairs-chart"></div>
+    <div class="dt-subtle mt-2"><strong>Method:</strong> counts of the orders that hold both products. Nothing is trained. Code: <code>recommendations.py</code>, <code>pair_counts()</code>.</div>
+</div>

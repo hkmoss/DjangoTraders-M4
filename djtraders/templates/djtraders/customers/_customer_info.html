@@ -1,0 +1,65 @@
+{# Partial (no base.html) for the Customer Info tab -- customer_info view. Loaded into #info-pane by LoadPageTab (DjangoTraders.js). The Edit button and "Start New Order" are only shown to an employee or the customer viewing their own page (self-service access rule, views/access.py). #}
+{% load humanize %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="dt-card mb-3">
+                <div class="dt-card-header">
+                    <h5>Customer Info</h5>
+                    {# Edit is only shown to an employee, or the customer viewing their own page -- see customer_access_denied in views/access.py. #}
+                    {% if current_employee or current_customer.customer_id == customer.customer_id %}
+                        <div class="dt-link-wrap btn dt-btn-primary-customer dt-hover-shadow">
+                            <a href="{% url 'djtraders:customer_edit' customer.customer_id %}" title="Edit this customer">
+                                <i class="fa-solid fa-pen-to-square me-1"></i>
+                                Edit
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                <table class="table mb-0">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Contact</th>
+                            <td>{{ customer.contact_name }}{% if customer.contact_title %}, {{ customer.contact_title }}{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Address</th>
+                            <td>{{ customer.formatted_address }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Phone</th>
+                            <td>{{ customer.phone }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="dt-card mb-3">
+                <h5 class="dt-card-title">Order Summary</h5>
+                <table class="table mb-0">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Total Quantity</th>
+                            <td class="text-end">{{ total_quantity }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Total Revenue</th>
+                            <td class="text-end">${{ total_revenue|floatformat:2|intcomma }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% if can_start_order %}
+                    <div class="text-end">
+                        <form method="post" action="{% url 'djtraders:order_create' customer.customer_id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn dt-btn-primary-customer dt-hover-shadow" title="Start a new order">
+                                <i class="fa-solid fa-cart-plus me-1"></i>
+                                Start New Order
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>

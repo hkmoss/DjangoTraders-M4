@@ -1,0 +1,61 @@
+<!--
+    The customer login page (customer_login_view). "customers" fills the Company
+    dropdown, so a customer picks a name instead of typing a 5-character ID, as
+    login.html does for employees. "error" is set only after a failed POST. The
+    card uses the customer (steel) colors; the Employee Login link is the other way in.
+-->
+{% extends "common/base.html" %}
+
+{% block title %}Customer Login{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="dt-card mt-4">
+                <h5 class="dt-card-title">
+                    <i class="fa-solid fa-user-lock dt-icon"></i>
+                    Customer Login
+                </h5>
+                {% if error %}
+                    <div class="alert alert-danger py-2">{{ error }}</div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="customer-select" class="form-label">Company</label>
+                        <select name="customer_id" id="customer-select" class="form-select" required>
+                            <option value="">Select your company</option>
+                            {% for customer in customers %}
+                                <option value="{{ customer.customer_id }}">{{ customer.company_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password-input" class="form-label">Password</label>
+                        <input type="password"
+                               name="password"
+                               id="password-input"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <button type="submit" class="btn dt-btn-primary-customer dt-hover-shadow w-100" title="Log in">
+                        <i class="fa-solid fa-right-to-bracket me-1"></i>
+                        Log In
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <div class="dt-link-wrap btn btn-sm dt-btn-secondary-employee dt-hover-shadow">
+                        <a href="{% url 'djtraders:login' %}" title="Log in as an employee">
+                            <i class="fa-solid fa-user-lock me-1"></i>
+                            Employee Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

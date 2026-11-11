@@ -1,0 +1,10 @@
+{# Top customers: the "Show Top" radio buttons reload only the chart (employee_customer_chart). #}
+<div class="dt-card h-100">
+    <h5 class="dt-card-title">Top Customers</h5>
+    <nav id="customer-controls" class="dt-controls"
+         data-url="{% url 'djtraders:employee_customer_chart' employee.employee_id %}">
+        {% include "djtraders/employees/_top_radios.html" with name="customer-top" %}
+        {% include "djtraders/employees/_chart_kind.html" with name="customer-kind" allow_pie=True %}
+    </nav>
+    <div id="dashboard-customers">{{ customer_plot|safe }}</div>
+</div>

@@ -1,0 +1,32 @@
+{# Leaderboard (managers only): every employee ranked by revenue. #}
+{% load humanize %}
+<div class="dt-card h-100">
+    <h5 class="dt-card-title">Employee Leaderboard</h5>
+    <div class="dt-subtle mb-1">Every employee ranked by revenue on the orders they handled. Visible to managers only.</div>
+    <div class="table-responsive dt-leaderboard-scroll">
+        <table id="leaderboard-table" class="table table-sm table-hover align-middle small mb-0 w-100">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Employee</th>
+                    <th class="text-end">Orders</th>
+                    <th class="text-end">Revenue</th>
+                    <th class="text-end">Average Order</th>
+                    <th class="text-end">Share</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in leaderboard %}
+                    <tr class="{% if row.is_self %}table-active fw-bold{% endif %}">
+                        <td>{{ row.rank }}</td>
+                        <td>{{ row.name }}</td>
+                        <td class="text-end">{{ row.orders|intcomma }}</td>
+                        <td class="text-end" data-order="{{ row.revenue|floatformat:2 }}">${{ row.revenue|floatformat:2|intcomma }}</td>
+                        <td class="text-end" data-order="{{ row.average_order|floatformat:2 }}">${{ row.average_order|floatformat:2|intcomma }}</td>
+                        <td class="text-end">{{ row.share|floatformat:1 }}%</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

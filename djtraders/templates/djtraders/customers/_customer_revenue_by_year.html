@@ -1,0 +1,18 @@
+{# Revenue by year: the chart arrives inside the page (Customer.annual_orders_plot). Choosing a trend sends it to customer_annual_chart, and ActivateAnnualTrend (customers.js) replaces #dashboard-annual with the chart that comes back. #}
+<div class="dt-card h-100">
+    <nav class="dt-controls">
+        <div class="dt-control-group">
+            <label for="annual-trend" class="fw-bold mb-0">Trend</label>
+            <select id="annual-trend"
+                    class="form-select w-auto"
+                    data-url="{% url 'djtraders:customer_annual_chart' customer.customer_id %}">
+                <option value="year" selected>Straight line through the years</option>
+                <option value="line">Straight line, from monthly history</option>
+                <option value="forest">Random forest, from monthly history</option>
+                <option value="average">3-month average</option>
+                <option value="compare">Compare all three</option>
+            </select>
+        </div>
+    </nav>
+    <div id="dashboard-annual">{{ annual_plot|safe }}</div>
+</div>

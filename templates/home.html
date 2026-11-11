@@ -1,0 +1,66 @@
+<!--
+    The project-level home page, at the top of templates/ because it belongs to
+    the whole project, not to djtraders. Normally it shows a welcome heading and
+    the large logo as one link into the djtraders home page.
+
+    When an employee or customer is still logged in, confirm_logout (set by
+    home() in views.py) shows an in-page Bootstrap alert asking whether to start
+    a new session, instead of a browser dialog. Only a real POST, from the
+    alert's Yes button, clears the session. The text and the Cancel link branch
+    on current_employee and current_customer.
+-->
+{% extends "common/base.html" %}
+{% load static %}
+
+{% block title %}DjangoTraders{% endblock %}
+
+{% block content %}
+    {% if confirm_logout %}
+        <div class="row justify-content-center py-5">
+            <div class="col-md-7">
+                <div class="alert alert-warning">
+                    <h4 class="alert-heading">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>Start a new session?
+                    </h4>
+                    <p>
+                        {% if current_employee %}
+                            This will log out {{ current_employee.first_name }} {{ current_employee.last_name }}
+                        {% elif current_customer %}
+                            This will log out {{ current_customer.company_name }}
+                        {% endif %}
+                        and start a new session -- a stand-in for closing and reopening the browser,
+                        since there's no reliable way for the app to detect that on its own. Are you sure?
+                    </p>
+                    <div class="d-flex">
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-warning bg-white text-black dt-hover-shadow">
+                                <i class="fa-solid fa-right-from-bracket me-1"></i>Yes, Start New Session
+                            </button>
+                        </form>
+                        {% if current_employee %}
+                            <a href="{% url 'djtraders:employee_me' %}"
+                               class="dt-link-wrap btn dt-btn-secondary-customer dt-hover-shadow">
+                                Cancel
+                            </a>
+                        {% elif current_customer %}
+                            <a href="{% url 'djtraders:customer_me' %}"
+                               class="dt-link-wrap btn dt-btn-secondary-customer dt-hover-shadow">
+                                Cancel
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <h1 class="display-4 mb-4">Welcome to DjangoTraders</h1>
+            <div class="dt-link-wrap d-inline-block dt-hover-shadow">
+                <a href="{% url 'djtraders:home' %}">
+                    <img src="{% static 'common/images/logo-large.svg' %}" alt="Go to the djTraders app">
+                </a>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

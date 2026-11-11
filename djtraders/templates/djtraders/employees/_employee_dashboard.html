@@ -1,0 +1,41 @@
+{# Partial (no base.html) for the Employee Dashboard tab -- employee_dashboard view. Everything here covers the orders this employee handled. #}
+{% if revenue_plot %}
+    {% include "djtraders/employees/_employee_tiles.html" %}
+    {# Row 1: revenue over time and, for a manager, the leaderboard. Without a leaderboard the chart takes the full width. #}
+    <div class="row g-3 mb-3">
+        <div class="{% if leaderboard %}col-lg-6{% else %}col-12{% endif %}">
+            {% include "djtraders/employees/_employee_revenue_over_time.html" %}
+        </div>
+        {% if leaderboard %}
+            <div class="col-lg-6">
+                {% include "djtraders/employees/_employee_leaderboard.html" %}
+            </div>
+        {% endif %}
+    </div>
+    {# Row 2: revenue breakdown and top customers. #}
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            {% include "djtraders/employees/_employee_revenue_breakdown.html" %}
+        </div>
+        <div class="col-lg-6">
+            {% include "djtraders/employees/_employee_top_customers.html" %}
+        </div>
+    </div>
+    {# Row 3: compared with the team, as a chart and a table. #}
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            {% include "djtraders/employees/_employee_team_comparison_chart.html" %}
+        </div>
+        <div class="col-lg-6">
+            {% include "djtraders/employees/_employee_team_comparison_table.html" %}
+        </div>
+    </div>
+    {# The Details modal for the revenue table; its contents load by AJAX (employee_period_detail). #}
+    <div class="modal fade" id="revenue-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" id="revenue-modal-content"></div>
+        </div>
+    </div>
+{% else %}
+    <div class="dt-subtle">No placed orders on record for {{ employee.first_name }} {{ employee.last_name }} yet.</div>
+{% endif %}

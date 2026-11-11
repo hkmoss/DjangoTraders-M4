@@ -1,0 +1,42 @@
+{# Team comparison table: averages and a nameless best, so no colleague is identified (Employee.team_comparison). #}
+{% load humanize %}
+<div class="dt-card h-100">
+    <h5 class="dt-card-title">Team Comparison Table</h5>
+    <div class="dt-subtle">
+        {{ you_label }} compared with the team. Team average is the mean across all employees, and Vs. average is how far you are above or below it. Best is the highest employee on that measure. Rank 1 is best.
+    </div>
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Measure</th>
+                <th class="text-end">{{ you_label }}</th>
+                <th class="text-end">Team average</th>
+                <th class="text-end">Vs. average</th>
+                <th class="text-end">Best</th>
+                <th class="text-end">Rank</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in comparison %}
+                <tr>
+                    <td>{{ row.label }}</td>
+                    {% if row.kind == "money" %}
+                        <td class="text-end fw-bold">${{ row.you|floatformat:0|intcomma }}</td>
+                        <td class="text-end">${{ row.team_average|floatformat:0|intcomma }}</td>
+                    {% else %}
+                        <td class="text-end fw-bold">{{ row.you|floatformat:0|intcomma }}</td>
+                        <td class="text-end">{{ row.team_average|floatformat:0|intcomma }}</td>
+                    {% endif %}
+                    <td class="text-end">
+                        <span class="{% if row.vs_average >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            <i class="fa-solid {% if row.vs_average >= 0 %}fa-arrow-trend-up{% else %}fa-arrow-trend-down{% endif %}"></i>
+                            {{ row.vs_average|floatformat:1 }}%
+                        </span>
+                    </td>
+                    <td class="text-end">{% if row.kind == "money" %}${% endif %}{{ row.best|floatformat:0|intcomma }}</td>
+                    <td class="text-end">{{ row.rank }} of {{ row.employee_count }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

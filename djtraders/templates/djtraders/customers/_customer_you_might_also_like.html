@@ -1,0 +1,54 @@
+{# You Might Also Like card: products to suggest (suggestions), or the most common pairs overall (popular) when there are none. #}
+<div class="dt-card h-100">
+    <h5 class="dt-card-title">You Might Also Like</h5>
+    {% if suggestions %}
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th title="The product you buy that this one goes with">Because you bought</th>
+                    <th class="text-end" title="How many times more often this product is in an order with something you buy than in orders in general">Lift</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in suggestions %}
+                    <tr>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.because }}</td>
+                        <td class="text-end">{{ item.lift|floatformat:2 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif popular %}
+        {% if has_orders %}
+            <div class="dt-subtle mb-2">Nothing new to suggest from your orders: you have already bought the products that turn up with yours, or too few orders pair them with anything else. These pairs are bought together most often across all orders.</div>
+        {% else %}
+            <div class="dt-subtle mb-2">There is not enough in your order history to suggest anything yet. These pairs are bought together most often across all orders.</div>
+        {% endif %}
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Products</th>
+                    <th class="text-end">Orders together</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pair in popular %}
+                    <tr>
+                        <td>{{ pair.product_name }} and {{ pair.product_name_other }}</td>
+                        <td class="text-end">{{ pair.orders_together }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="dt-subtle">No pairs of products have been ordered together often enough to show.</div>
+    {% endif %}
+    <div class="dt-subtle">
+        <strong>Method:</strong> association analysis. Lift is counts and ratios of orders that hold both products; nothing is trained.
+        Code: <code>recommendations.py</code>, <code>recommend_for()</code>.
+        Built from what all customers order together, counting only pairs that appear in at least {{ min_orders }} orders.
+        These are patterns to try, not predictions: in this data the pairs are only a little stronger than chance.
+    </div>
+</div>

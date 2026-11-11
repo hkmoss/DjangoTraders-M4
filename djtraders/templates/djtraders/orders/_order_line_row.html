@@ -1,0 +1,21 @@
+<!--
+    One <tr> for order_build.html's line-items table, rendered on first load and by order_add_line's AJAX response
+    so a line looks the same either way. data-product-id is how AddOrderLineItem (orders.js) finds an existing row
+    to replace. line.discount_percent is the stored 0.0-1.0 discount times 100, for display.
+-->
+<tr data-product-id="{{ line.product.product_id }}">
+    <td>{{ line.product.product_name }}</td>
+    <td class="text-end">${{ line.unit_price|floatformat:2 }}</td>
+    <td class="text-end">{{ line.quantity }}</td>
+    <td class="text-end">{{ line.discount_percent|floatformat:2 }}%</td>
+    <td class="text-end">${{ line.line_total|floatformat:2 }}</td>
+    <td class="text-center">
+        <!-- Remove is one click with no confirm step. -->
+        <form method="post" action="{% url 'djtraders:order_remove_line' customer_id line.product.product_id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm dt-btn-secondary-customer dt-hover-shadow" title="Remove from cart">
+                <i class="fa-solid fa-trash dt-icon-danger"></i>
+            </button>
+        </form>
+    </td>
+</tr>

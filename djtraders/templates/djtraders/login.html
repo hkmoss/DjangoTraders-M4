@@ -1,0 +1,56 @@
+<!--
+    The employee login page (login_view). "employees" fills the dropdown, so an
+    employee picks a name instead of typing an ID; "error" is set only after a
+    failed POST. The card uses the employee (slate) colors.
+-->
+{% extends "common/base.html" %}
+
+{% block title %}Employee Login{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="dt-card mt-4">
+                <h5 class="dt-card-title">
+                    <i class="fa-solid fa-user-lock dt-icon-employee"></i>
+                    Employee Login
+                </h5>
+                {% if error %}
+                    <div class="alert alert-danger py-2">{{ error }}</div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="employee-select" class="form-label">Employee</label>
+                        <select name="employee_id" id="employee-select" class="form-select" required>
+                            <option value="">Select your name</option>
+                            {% for employee in employees %}
+                                <option value="{{ employee.employee_id }}">
+                                    {{ employee.first_name }} {{ employee.last_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password-input" class="form-label">PIN</label>
+                        {# The PIN is the 4-digit year of the picked employee's own birth_date -- see Employee.authenticate (djtraders/models.py). #}
+                        <input type="password"
+                               name="password"
+                               id="password-input"
+                               class="form-control"
+                               placeholder="####"
+                               maxlength="4"
+                               required>
+                    </div>
+
+                    <button type="submit" class="btn dt-btn-primary-employee dt-hover-shadow w-100" title="Log in">
+                        <i class="fa-solid fa-right-to-bracket me-1"></i>
+                        Log In
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

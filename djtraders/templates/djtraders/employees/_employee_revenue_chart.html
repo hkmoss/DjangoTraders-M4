@@ -1,0 +1,6 @@
+{# Partial (no base.html) for the revenue-over-time card's chart -- employee_dashboard renders it first, employee_revenue_chart replaces it when "View by" or the year changes. #}
+{% if revenue_plot %}
+    {{ revenue_plot|safe }}
+{% else %}
+    <div class="dt-subtle">No placed orders on record.</div>
+{% endif %}

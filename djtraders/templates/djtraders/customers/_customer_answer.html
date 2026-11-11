@@ -1,0 +1,102 @@
+{# Answer card: what the tool returned (result): a sentence, a Confirm card for a proposed change, a table or a chart, and the Explain this and Draft a reorder note buttons; or, when the language model wrote the answer (result.agent), its text and what the tools it called returned; when no tool fit, the menu of example questions (menu, unsure). #}
+{% load humanize %}
+<div class="dt-card h-100">
+    <h5 class="dt-card-title">Answer</h5>
+
+    {% if result %}
+        {% if result.agent %}
+            <div class="small mb-1">
+                <span class="dt-actor dt-actor-ai">AI</span> Written by the language model from the tools below.
+                {% if result.agent.check %}<span class="dt-subtle">Checked by our code:</span>
+                    <mark class="dt-found">in the tool results</mark> <mark class="dt-not-found">not in them</mark>{% endif %}
+            </div>
+            <div class="mb-3 dt-ai-text">{% if result.agent.check %}{{ result.agent.check.html }}{% else %}{{ result.sentence }}{% endif %}</div>
+            {% for call in result.agent.calls %}
+                {% if call.result %}
+                    <details class="mb-2" open>
+                        <summary class="fw-bold"><span class="dt-actor dt-actor-code">Our code</span> What <code>{{ call.name }}</code> returned</summary>
+                        <div class="dt-subtle my-1">{{ call.result.sentence }}</div>
+                        {% include "djtraders/customers/_customer_assistant_result_table.html" with table_result=call.result %}
+                    </details>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="mb-3">{{ result.sentence }}</div>
+        {% endif %}
+        
+        {% if result.proposal %}
+            <form class="ask-confirm-form" method="post" action="{% url 'djtraders:customer_ask_confirm' customer.customer_id %}">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ result.proposal.product_id }}">
+                <input type="hidden" name="quantity" value="{{ result.proposal.quantity }}">
+                <button type="submit" class="btn dt-btn-primary-customer dt-hover-shadow" title="Add {{ result.proposal.product_name }} to the cart">
+                    <i class="fa-solid fa-cart-plus me-1"></i>
+                    Confirm
+                </button>
+                <button type="button" class="btn dt-btn-secondary-customer dt-hover-shadow ask-cancel" title="Do not add anything">
+                    <i class="fa-solid fa-xmark me-1"></i>
+                    Cancel
+                </button>
+            </form>
+        {% endif %}
+
+        {% include "djtraders/customers/_customer_assistant_result_table.html" with table_result=result %}
+        {% if result.chart %}{{ result.chart|safe }}{% endif %}
+        {% if result.details %}
+            <details class="mt-3" open>
+                <summary class="fw-bold">Under the hood: what the model computed</summary>
+                <table class="table table-sm mt-2 mb-0">
+                    <tbody>
+                        {% for label, value in result.details %}
+                            <tr>
+                                <th scope="row">{{ label }}</th>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </details>
+        {% endif %}
+        {% if tool and result.rows and not result.agent and not result.proposal %}
+            <form class="ask-write-form d-flex flex-wrap gap-2 mt-3" method="post" action="{% url 'djtraders:customer_ask_write' customer.customer_id %}">
+                {% csrf_token %}
+                <input type="hidden" name="tool" value="{{ tool.name }}">
+                {% for row in argument_rows %}
+                    <input type="hidden" name="arg_{{ row.name }}" value="{{ row.value }}">
+                {% endfor %}
+                <button type="submit" name="kind" value="explain" class="btn btn-sm dt-btn-secondary-customer dt-hover-shadow" title="Ask the language model to explain this result">
+                    <i class="fa-solid fa-wand-magic-sparkles me-1" aria-hidden="true"></i>Explain this
+                </button>
+                {% if role != "employee" and tool.name == "buy_again" or role != "employee" and tool.name == "recommend_for_me" %}
+                    <button type="submit" name="kind" value="draft" class="btn btn-sm dt-btn-secondary-customer dt-hover-shadow" title="Ask the language model to draft a reorder note to your sales representative">
+                        <i class="fa-solid fa-envelope me-1" aria-hidden="true"></i>Draft a reorder note
+                    </button>
+                {% endif %}
+            </form>
+        {% endif %}
+        {% if writing %}
+            <div class="dt-ai-box mt-3">
+                <div class="fw-bold mb-1">
+                    <span class="dt-actor dt-actor-ai">AI</span> {% if writing.kind == "draft" %}A reorder note, drafted by the language model{% else %}Explained by the language model{% endif %}
+                </div>
+                {% if writing.note %}
+                    <div class="text-danger" role="alert">The model did not write anything: {{ writing.note }}. Connect a language model as in the Week 12 guide, or try again.</div>
+                {% else %}
+                    <div class="dt-ai-text">{% if writing.check %}{{ writing.check.html }}{% else %}{{ writing.text }}{% endif %}</div>
+                    <div class="small mt-1"><span class="dt-subtle">Checked by our code:</span> <mark class="dt-found">in the result</mark> <mark class="dt-not-found">not in it</mark></div>
+                    {% if writing.kind == "draft" %}<div class="dt-subtle mt-1">Nothing is sent. Copy the note if you want to use it.</div>{% endif %}
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="mb-2">
+            {% if unsure %}I was not sure which tool you meant. Try a button, or ask it one of these ways:
+            {% else %}I can answer questions like these:{% endif %}
+        </div>
+        <ul>
+            {% for tool in menu %}
+                <li>{{ tool.example }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>

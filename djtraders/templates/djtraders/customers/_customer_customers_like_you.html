@@ -1,0 +1,33 @@
+{# Customers Like You card: products bought by the customers whose orders are most like this customer's (like_you), or why there are none. #}
+<div class="dt-card h-100">
+    <h5 class="dt-card-title">Customers Like You</h5>
+    {% if like_you %}
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th class="text-end" title="How many of the {{ similar_count }} customers most like you bought this product">Customers like you who bought it</th>
+                    <th class="text-end" title="The percent of all customers who bought this product. A product nearly everyone buys says little about people like you.">All customers who bought it</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in like_you %}
+                    <tr>
+                        <td>{{ item.product_name }}</td>
+                        <td class="text-end">{{ item.bought_by }} of {{ item.neighbours }}</td>
+                        <td class="text-end">{{ item.overall }}%</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif has_orders %}
+        <div class="dt-subtle mb-2">Nothing to suggest: you have bought every product the customers most like you have bought, or too few of them bought it to show.</div>
+    {% else %}
+        <div class="dt-subtle mb-2">Place a few orders first. Customers like you are found from the products you have bought.</div>
+    {% endif %}
+    <div class="dt-subtle">
+        <strong>Method:</strong> machine learning by nearest neighbours. Cosine similarity compares each customer's product counts with yours; nothing is trained, customers are compared.
+        Code: <code>similar_customers.py</code>.{% if like_you_similarity %} The {{ like_you_similarity|length }} nearest customers have a similarity of {{ like_you_similarity|last|floatformat:2 }} to {{ like_you_similarity.0|floatformat:2 }} with you (1 is the same mix of products).{% endif %}
+        Built from the {{ similar_count }} customers whose orders are most like yours. No customer is named, and a product is shown only when at least {{ min_customers }} of them bought it. When products tie, the one fewer customers bought overall comes first.
+    </div>
+</div>

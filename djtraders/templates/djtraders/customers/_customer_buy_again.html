@@ -1,0 +1,32 @@
+{# Buy Again card: products this customer orders on a rhythm whose usual gap has passed (buy_again). A rule on their own order dates, not a model. #}
+<div class="dt-card h-100">
+    <h5 class="dt-card-title">Buy Again</h5>
+    {% if buy_again %}
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th class="text-end" title="The usual number of days between your orders of this product">Usual days between</th>
+                    <th class="text-end">Days since last</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in buy_again %}
+                    <tr>
+                        <td>{{ item.product_name }}</td>
+                        <td class="text-end">{{ item.usual_days|floatformat:0 }}</td>
+                        <td class="text-end">{{ item.days_since }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif has_orders %}
+        <div class="dt-subtle mb-2">Nothing looks due. Only products you have ordered on at least {{ buy_again_min_orders }} different orders are checked, and none is past its usual gap.</div>
+    {% else %}
+        <div class="dt-subtle mb-2">Place a few orders first. Buy Again looks at how often you order the same product.</div>
+    {% endif %}
+    <div class="dt-subtle">
+        <strong>Method:</strong> a rule on dates, not machine learning. Code: <code>buy_again.py</code>.
+        Built only from your own order dates: the median gap between your orders of a product, compared with the days since the last one. It is a rule, not a model, and it uses no other customer's data.
+    </div>
+</div>

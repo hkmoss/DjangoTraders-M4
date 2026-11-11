@@ -1,0 +1,55 @@
+{# Tool Calls card for an answer the agent loop wrote (planner.answer_with_tools): the question, each tool the model asked for with its arguments and checks, and The AI's text. Each stage carries a chip saying who did it: you, the AI (the language model) or our code. agent is the loop's outcome. #}
+<div class="dt-card">
+    <h5 class="dt-card-title">Tool Calls: how this answer was made</h5>
+    <div class="small mb-2">
+        Who does what: <span class="dt-actor dt-actor-you">You</span> ask,
+        <span class="dt-actor dt-actor-ai">AI</span> the language model chooses and writes,
+        <span class="dt-actor dt-actor-code">Our code</span> checks, runs the tools and checks the text.
+    </div>
+    <ol class="mb-0 ps-3">
+        <li class="mb-3">
+            <span class="dt-actor dt-actor-you">You</span> <strong>Your question</strong>
+            <div class="dt-subtle">{{ question }}</div>
+            {% if history_used %}
+                <div class="dt-subtle">Sent with your {{ history_used }} earlier question{{ history_used|pluralize }} and the answer{{ history_used|pluralize }}, so the model can follow on. The model keeps no memory: our code sends them again each time.</div>
+            {% endif %}
+        </li>
+
+        <li class="mb-3">
+            <span class="dt-actor dt-actor-ai">AI</span> <strong>The model chose the tools</strong>
+            <div class="dt-subtle">It was sent our instructions, your question and the list of tools. It does not run anything: it names a tool and its arguments, and our code decides.</div>
+            {% if agent.calls %}
+                <div class="dt-subtle">It asked for: {% for call in agent.calls %}<code>{{ call.name }}</code>{% if not forloop.last %}, {% endif %}{% endfor %}</div>
+            {% else %}
+                <div class="mt-1"><strong>It called no tool.</strong></div>
+            {% endif %}
+        </li>
+
+        {% for call in agent.calls %}
+            <li class="mb-3">
+                <span class="dt-actor dt-actor-code">Our code</span> <strong>Ran <code>{{ call.name }}</code></strong>
+                {% if call.tool %}
+                    {% if call.tool.technique == "Machine learning" %}
+                        <span class="badge text-bg-success">machine learning{% if call.tool.learning %}, {{ call.tool.learning }}{% endif %}</span>
+                    {% else %}
+                        <span class="badge text-bg-secondary">{{ call.tool.technique|lower }}, no model</span>
+                    {% endif %}
+                {% endif %}
+                <div class="dt-subtle">Arguments the model sent: <code>{{ call.arguments|default_if_none:"(not valid JSON)" }}</code></div>
+                {% if call.errors %}
+                    <div class="text-danger small" role="alert">Not run: {% for error in call.errors %}{{ error }} {% endfor %}</div>
+                {% else %}
+                    <div class="dt-subtle">Checked first: the tool is in the registry for you and the arguments are in range. The customer comes from the page, not the model.</div>
+                    {% if call.tool.method %}<div class="dt-subtle"><strong>Method:</strong> {{ call.tool.method }}</div>{% endif %}
+                    {% if call.tool.where %}<div class="dt-subtle"><strong>Where to read the code:</strong> <code>{{ call.tool.where }}</code></div>{% endif %}
+                    <details class="mt-1">
+                        <summary class="dt-subtle">The result our code sent back to the model</summary>
+                        <pre class="dt-ai-sent">{{ call.facts }}</pre>
+                    </details>
+                {% endif %}
+            </li>
+        {% endfor %}
+
+        {% include "djtraders/customers/_customer_assistant_ai_text.html" with ai=agent %}
+    </ol>
+</div>

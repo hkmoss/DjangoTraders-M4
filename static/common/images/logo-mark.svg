@@ -1,0 +1,6 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="7" fill="lightsteelblue"/>
+  <polygon points="7,9 7,23 16,16" fill="steelblue"/>
+  <polygon points="25,9 25,23 16,16" fill="goldenrod"/>
+  <text x="16" y="16" text-anchor="middle" dominant-baseline="central" font-family="'Segoe UI', Tahoma, 'Trebuchet MS', sans-serif" font-size="9" font-weight="800" fill="white">dT</text>
+</svg>

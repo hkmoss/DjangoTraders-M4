@@ -1,0 +1,61 @@
+<!--
+    The supplier login page (supplier_login_view), built like customer_login.html:
+    a Company dropdown from the "suppliers" queryset, with "error" set after a
+    failed POST. Every supplier uses the same shared password
+    (Supplier.SHARED_PASSWORD). The card uses the supplier (sage) colors.
+-->
+{% extends "common/base.html" %}
+
+{% block title %}Supplier Login{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="dt-card mt-4">
+                <h5 class="dt-card-title">
+                    <i class="fa-solid fa-truck-field dt-icon-supplier"></i>
+                    Supplier Login
+                </h5>
+                {% if error %}
+                    <div class="alert alert-danger py-2">{{ error }}</div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="supplier-select" class="form-label">Company</label>
+                        <select name="supplier_id" id="supplier-select" class="form-select" required>
+                            <option value="">Select your company</option>
+                            {% for supplier in suppliers %}
+                                <option value="{{ supplier.supplier_id }}">{{ supplier.company_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password-input" class="form-label">Password</label>
+                        <input type="password"
+                               name="password"
+                               id="password-input"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <button type="submit" class="btn dt-btn-primary-supplier dt-hover-shadow w-100" title="Log in">
+                        <i class="fa-solid fa-right-to-bracket me-1"></i>
+                        Log In
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <div class="dt-link-wrap btn btn-sm dt-btn-secondary-customer dt-hover-shadow">
+                        <a href="{% url 'djtraders:customer_login' %}" title="Log in as a customer">
+                            <i class="fa-solid fa-user-lock me-1"></i>
+                            Customer Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

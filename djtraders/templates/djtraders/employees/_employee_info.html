@@ -1,0 +1,38 @@
+{# Partial (no base.html) for the Employee Info tab -- employee_info view. #}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="dt-card mb-3">
+            <h5 class="dt-card-title">Employee Info</h5>
+            <table class="table mb-0">
+                <tbody>
+                    <tr>
+                        <th scope="row">Title</th>
+                        <td>{{ employee.title|default:"—" }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Reports To</th>
+                        <td>
+                            {% if employee.reports_to %}
+                                {{ employee.reports_to.first_name }} {{ employee.reports_to.last_name }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Hire Date</th>
+                        <td>{{ employee.hire_date|default:"—" }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Phone</th>
+                        <td>{{ employee.home_phone|default:"—" }}{% if employee.extension %} ext. {{ employee.extension }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Address</th>
+                        <td>{{ employee.formatted_address|default:"—" }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

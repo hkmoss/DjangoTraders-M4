@@ -1,0 +1,115 @@
+{# Pipeline card: the stages the assistant went through for this question, so nothing it did is hidden. Uses the outcome of agent.answer_question / answer_button: question, steps, tool, chooser, chooser_rows, argument_rows, function_name, errors. #}
+<div class="dt-card">
+    <h5 class="dt-card-title">Tool Calls: how this answer was made</h5>
+    <ol class="mb-0 ps-3">
+        <li class="mb-3">
+            <span class="dt-actor dt-actor-you">You</span> <strong>Your question</strong>
+            <div class="dt-subtle">{{ question }}</div>
+        </li>
+
+        <li class="mb-3">
+            {% if chooser == "language model" %}<span class="dt-actor dt-actor-ai">AI</span>{% elif chooser == "button" %}<span class="dt-actor dt-actor-you">You</span>{% else %}<span class="dt-actor dt-actor-code">Our code</span>{% endif %} <strong>Choosing the tool</strong>
+            {% for label, detail in steps %}{% if label == "Language model" %}<div class="dt-subtle">{{ detail }}</div>{% endif %}{% endfor %}
+            {% if chooser == "button" %}
+                <div class="dt-subtle">You picked {% if tool %}<code>{{ tool.name }}</code>{% else %}a tool{% endif %} yourself, so nothing was matched.</div>
+            {% elif chooser == "language model" %}
+                <div class="dt-subtle">The language model read your question, chose <code>{{ tool.name }}</code> and wrote its arguments.</div>
+            {% elif chooser == "keywords" %}
+                <div class="dt-subtle">Counted the tools' keywords found in your question.</div>
+            {% elif chooser_rows %}
+                <div class="dt-subtle mb-1">TF-IDF similarity between your words and each tool's description, example and keywords. The three closest:</div>
+                {% for row in chooser_rows %}
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <code class="flex-shrink-0 dt-similarity-name">{{ row.name }}</code>
+                        <progress class="flex-grow-1 dt-similarity-bar{% if row.chosen %} dt-similarity-chosen{% endif %}" value="{{ row.percent }}" max="100" aria-label="Similarity of {{ row.name }}">{{ row.percent }}%</progress>
+                        <span class="small dt-similarity-score">{{ row.score|floatformat:2 }}</span>
+                    </div>
+                {% endfor %}
+                <div class="dt-subtle">A tool is chosen only when its score is at least {{ min_similarity }} and it leads the runner-up by at least {{ min_lead }}. Otherwise the assistant says it is not sure rather than guess.</div>
+            {% endif %}
+            {% if not tool %}
+                <div class="mt-1"><strong>No tool was run.</strong></div>
+            {% endif %}
+        </li>
+
+        {% if tool %}
+            <li class="mb-3">
+                <span class="dt-actor dt-actor-code">Our code</span> <strong>Reading the arguments</strong>
+                {% if argument_rows %}
+                    <div class="dt-subtle mb-1">Each argument is a typed input of <code>{{ tool.name }}</code>. Change one and run again to see how the answer changes.</div>
+                    <form class="ask-args-form" method="post" action="{% url 'djtraders:customer_ask_answer' customer.customer_id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="tool" value="{{ tool.name }}">
+                        {% for row in argument_rows %}
+                            <div class="mb-2">
+                                <label for="arg-{{ row.name }}" class="form-label mb-0"><code>{{ row.name }}</code>
+                                    <span class="badge {% if row.source == 'default' %}text-bg-light border{% else %}text-bg-primary{% endif %}">{% if row.source == "default" %}default{% else %}from {{ row.source }}{% endif %}</span>
+                                </label>
+                                {% if row.choices %}
+                                    <select id="arg-{{ row.name }}" name="arg_{{ row.name }}" class="form-select form-select-sm">
+                                        {% for choice in row.choices %}
+                                            <option value="{{ choice }}"{% if choice == row.value %} selected{% endif %}>{{ choice }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% elif row.kind == "int" or row.kind == "float" %}
+                                    <input type="number" id="arg-{{ row.name }}" name="arg_{{ row.name }}" class="form-control form-control-sm"
+                                           value="{{ row.value }}" min="{{ row.minimum|safe }}" max="{{ row.maximum|safe }}" step="{{ row.step }}">
+                                {% else %}
+                                    <input type="text" id="arg-{{ row.name }}" name="arg_{{ row.name }}" class="form-control form-control-sm" value="{{ row.value }}">
+                                {% endif %}
+                                <div class="dt-subtle">{{ row.description }}</div>
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-sm dt-btn-secondary-customer dt-hover-shadow" title="Run {{ tool.name }} again with these arguments">
+                            <i class="fa-solid fa-play me-1" aria-hidden="true"></i>Run again
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="dt-subtle"><code>{{ tool.name }}</code> takes no arguments.</div>
+                {% endif %}
+                {% if errors %}
+                    <div class="text-danger small mt-1" role="alert">{% for error in errors %}{{ error }} {% endfor %}</div>
+                {% endif %}
+            </li>
+
+            <li class="mb-3">
+                <span class="dt-actor dt-actor-code">Our code</span> <strong>Checks</strong>
+                {% for label, detail in steps %}{% if label == "Checked the arguments" or label == "Customer" %}
+                    <div class="dt-subtle">{{ label }}: {{ detail }}</div>
+                {% endif %}{% endfor %}
+                <div class="dt-subtle">The tool is in the registry and switched on for you.</div>
+            </li>
+
+            <li class="mb-3">
+                <span class="dt-actor dt-actor-code">Our code</span> <strong>The tool</strong>
+                <div>
+                    <code>{{ tool.name }}</code>
+                    {% if tool.learning %}<span class="badge text-bg-success">machine learning, {{ tool.learning }}</span>{% endif %}
+                </div>
+                <div class="dt-subtle"><strong>Method:</strong> {{ tool.method }}</div>
+                <div class="dt-subtle"><strong>Where to read the code:</strong> <code>{{ tool.where }}</code></div>
+                <details class="mt-1">
+                    <summary class="dt-subtle">Anatomy of this tool</summary>
+                    <div class="dt-subtle">It is one entry in <code>TOOL_LIST</code> in <code>agent/tools.py</code>, plus the function the entry points to. To add a tool you add one entry and one function.</div>
+                    <dl class="small mb-0 mt-1">
+                        <dt>name</dt><dd><code>{{ tool.name }}</code></dd>
+                        <dt>kind</dt><dd><code>{{ tool.kind }}</code> ({% if tool.kind == "write" %}changes data, so it only proposes and waits for Confirm{% else %}only reads data{% endif %})</dd>
+                        <dt>description</dt><dd>{{ tool.description }}</dd>
+                        <dt>arguments</dt>
+                        <dd>{% for row in argument_rows %}<code>{{ row.name }}</code> ({{ row.kind }}){% if not forloop.last %}, {% endif %}{% empty %}none{% endfor %}</dd>
+                        <dt>runs</dt><dd><code>{{ function_name }}(customer, arguments)</code>, which returns a <code>ToolResult</code></dd>
+                        <dt>keywords and example</dt><dd>the words the matcher compares with your question: {{ tool.keywords|join:", " }}. Example: "{{ tool.example }}"</dd>
+                    </dl>
+                </details>
+            </li>
+
+            <li>
+                <span class="dt-actor dt-actor-code">Our code</span> <strong>The result</strong>
+                <div class="dt-subtle">A <code>ToolResult</code>: a sentence, with a table, a chart or a confirm step when the tool gives one{% if tool.learning %}, and, because this is a model, <em>Under the hood</em>: what it computed{% endif %}. It is shown in the Answer card.</div>
+            </li>
+        {% endif %}
+        {% if writing %}
+            {% include "djtraders/customers/_customer_assistant_ai_text.html" with ai=writing %}
+        {% endif %}
+    </ol>
+</div>

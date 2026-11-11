@@ -1,0 +1,30 @@
+{# Revenue over time: "View by" and the year dropdown reload the chart, and a Details button opens a modal for one period (ActivateRevenueOverTime in employees.js). #}
+<div class="dt-card h-100">
+    <h5 class="dt-card-title">Revenue Over Time</h5>
+    <nav id="revenue-controls" class="dt-controls"
+         data-url="{% url 'djtraders:employee_revenue_chart' employee.employee_id %}"
+         data-detail-url="{% url 'djtraders:employee_period_detail' employee.employee_id %}">
+        <div class="dt-control-group" role="radiogroup" aria-labelledby="revenue-level-label">
+            <span id="revenue-level-label" class="fw-bold">View by</span>
+            <div class="form-check form-check-inline mb-0">
+                <input class="form-check-input" type="radio" name="revenue-level" id="revenue-level-year" value="year" checked>
+                <label class="form-check-label" for="revenue-level-year">Year</label>
+            </div>
+            <div class="form-check form-check-inline mb-0">
+                <input class="form-check-input" type="radio" name="revenue-level" id="revenue-level-month" value="month">
+                <label class="form-check-label" for="revenue-level-month">Month</label>
+            </div>
+        </div>
+        <div class="dt-control-group">
+            {# At the Year level this reads "Details for" and a choice opens the modal; at the Month level it reads "Year" and filters the chart. #}
+            <label for="revenue-year" class="fw-bold mb-0">Details for</label>
+            <select id="revenue-year" class="form-select w-auto">
+                <option value="all" selected>Choose a year</option>
+                {% for year in revenue_years %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </nav>
+    <div id="dashboard-revenue">{% include "djtraders/employees/_employee_revenue_chart.html" %}</div>
+</div>

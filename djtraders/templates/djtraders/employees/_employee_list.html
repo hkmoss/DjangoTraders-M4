@@ -1,0 +1,28 @@
+{# Partial (no base.html) for the Employees tab (managers only) -- employee_list view. #}
+<table id="employees-table"
+       class="table table-striped table-bordered table-hover align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Title</th>
+            <th>Reports To</th>
+            <th>Hire Date</th>
+            <th>Phone</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for employee in employees %}
+            <tr>
+                <td>
+                    <a href="{% url 'djtraders:employee_detail' employee.employee_id %}">
+                        {{ employee.last_name }}, {{ employee.first_name }}
+                    </a>
+                </td>
+                <td>{{ employee.title|default:"—" }}</td>
+                <td>{% if employee.reports_to %}{{ employee.reports_to.first_name }} {{ employee.reports_to.last_name }}{% else %}—{% endif %}</td>
+                <td data-sort="{{ employee.hire_date|date:'Y-m-d' }}">{{ employee.hire_date|default:"—" }}</td>
+                <td>{{ employee.home_phone|default:"—" }}{% if employee.extension %} ext. {{ employee.extension }}{% endif %}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

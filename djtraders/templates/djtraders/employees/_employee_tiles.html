@@ -1,0 +1,83 @@
+{% load humanize %}
+{# Four comparison tiles (numbers from Employee.performance()). Click one to flip it: the front shows the measure, the back explains it. #}
+<div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3">
+        <div class="dt-flip dt-tile-slate h-100"
+             onclick="this.classList.toggle('dt-flipped')"
+             title="Click to flip">
+            <div class="dt-flip-front">
+                <div class="dt-stat-label">Revenue Rank</div>
+                <div class="dt-stat-value">
+{{ performance.revenue_rank }}
+                    <span class="fs-6 text-muted">of {{ performance.employee_count }}</span>
+                </div>
+                <div class="dt-stat-note">
+                    {% if performance.colleagues_behind == 0 %}Top of the team{% else %}Ahead of {{ performance.colleagues_behind }} colleague{{ performance.colleagues_behind|pluralize }}{% endif %}
+                </div>
+            </div>
+            <div class="dt-flip-back">
+                <div class="dt-stat-label">Revenue Rank</div>
+                <div class="dt-stat-note">Where your total revenue ranks among all employees.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="dt-flip dt-tile-order h-100"
+             onclick="this.classList.toggle('dt-flipped')"
+             title="Click to flip">
+            <div class="dt-flip-front">
+                <div class="dt-stat-label">Orders Rank</div>
+                <div class="dt-stat-value">{{ performance.orders_rank }} <span class="fs-6 text-muted">of {{ performance.employee_count }}</span></div>
+                <div class="dt-stat-note">{{ performance.orders|intcomma }} orders handled</div>
+            </div>
+            <div class="dt-flip-back">
+                <div class="dt-stat-label">Orders Rank</div>
+                <div class="dt-stat-note">Where the number of orders you handled ranks among all employees.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="dt-flip dt-tile-steel h-100"
+             onclick="this.classList.toggle('dt-flipped')"
+             title="Click to flip">
+            <div class="dt-flip-front">
+                <div class="dt-stat-label">Share of Company Revenue</div>
+                <div class="dt-stat-value">{{ performance.share|floatformat:1 }}%</div>
+                <div class="dt-stat-note">
+                    {% if performance.share >= performance.team_share %}
+                        <i class="fa-solid fa-arrow-trend-up text-success"></i>
+                    {% else %}
+                        <i class="fa-solid fa-arrow-trend-down text-danger"></i>
+                    {% endif %}
+                    Team average: {{ performance.team_share|floatformat:1 }}% each
+                </div>
+            </div>
+            <div class="dt-flip-back">
+                <div class="dt-stat-label">Share of Company Revenue</div>
+                <div class="dt-stat-note">Your revenue as a percentage of all employees' combined revenue. The team average is all sales 100% divided by the number of employees.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="dt-flip dt-tile-sage h-100"
+             onclick="this.classList.toggle('dt-flipped')"
+             title="Click to flip">
+            <div class="dt-flip-front">
+                <div class="dt-stat-label">Average Order</div>
+                <div class="dt-stat-value">${{ performance.average_order|floatformat:2|intcomma }}</div>
+                <div class="dt-stat-note">
+                    {% if performance.average_order_diff >= 0 %}
+                        <i class="fa-solid fa-arrow-trend-up text-success"></i>
+                    {% else %}
+                        <i class="fa-solid fa-arrow-trend-down text-danger"></i>
+                    {% endif %}
+                    {{ performance.average_order_diff|floatformat:"1" }}% vs team average
+                </div>
+            </div>
+            <div class="dt-flip-back">
+                <div class="dt-stat-label">Average Order</div>
+                <div class="dt-stat-note">Your average order compared to all employees. Green = your orders are more than the average.</div>
+            </div>
+        </div>
+    </div>
+</div>

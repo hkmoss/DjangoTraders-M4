@@ -1,0 +1,16 @@
+{# Team comparison chart: one measure at a time, this employee against the team average and the best employee (Employee.team_comparison_plot). #}
+<div class="dt-card h-100">
+    <h5 class="dt-card-title">Team Comparison Chart</h5>
+    <div id="team-controls" class="dt-controls"
+         data-url="{% url 'djtraders:employee_team_chart' employee.employee_id %}">
+        <div class="dt-control-group">
+            <label for="team-measure" class="fw-bold mb-0">Compare</label>
+            <select id="team-measure" class="form-select w-auto">
+                {% for key, label in team_measures.items %}
+                    <option value="{{ key }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div id="dashboard-team">{{ comparison_plot|safe }}</div>
+</div>

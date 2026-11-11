@@ -1,0 +1,26 @@
+{# Revenue by month for the chosen year. Choosing a year sends it to customer_monthly_chart, and ActivateYearDropdown (customers.js) replaces #dashboard-monthly with the chart that comes back. #}
+<div class="dt-card h-100">
+    <nav class="dt-controls">
+        <div class="dt-control-group">
+            <label for="dashboard-year" class="fw-bold mb-0">Year</label>
+            <select id="dashboard-year"
+                    class="form-select w-auto"
+                    data-url="{% url 'djtraders:customer_monthly_chart' customer.customer_id %}">
+                {% for year in order_years %}
+                    <option value="{{ year }}"{% if forloop.first %} selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="dt-control-group">
+            <label for="dashboard-trend" class="fw-bold mb-0">Trend</label>
+            <select id="dashboard-trend" class="form-select w-auto">
+                <option value="year" selected>This year only</option>
+                <option value="line">Straight line, all months</option>
+                <option value="forest">Random forest, all months</option>
+                <option value="average">3-month average</option>
+                <option value="compare">Compare all three</option>
+            </select>
+        </div>
+    </nav>
+    <div id="dashboard-monthly"></div>
+</div>

@@ -1,0 +1,22 @@
+{# Partial (no base.html) for the Recommendations tab -- customer_recommendations view. The two suggestion cards sit side by side, then Buy Again beside Bought Together, then Compared With Chance. ActivatePairsDropdown (customers.js) fills #pairs-chart. #}
+<div class="row g-3 mb-3">
+    <div class="col-lg-6">
+        {% include "djtraders/customers/_customer_you_might_also_like.html" %}
+    </div>
+    <div class="col-lg-6">
+        {% include "djtraders/customers/_customer_customers_like_you.html" %}
+    </div>
+</div>
+<div class="row g-3 mb-3">
+    <div class="col-lg-5">
+        {% include "djtraders/customers/_customer_buy_again.html" %}
+    </div>
+    <div class="col-lg-7">
+        {% include "djtraders/customers/_customer_bought_together.html" %}
+    </div>
+</div>
+<div class="row g-3 mb-3">
+    <div class="col-lg-6">
+        {% include "djtraders/customers/_customer_compared_with_chance.html" %}
+    </div>
+</div>

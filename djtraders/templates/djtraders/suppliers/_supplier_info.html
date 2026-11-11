@@ -1,0 +1,55 @@
+{# Partial (no base.html) for the supplier Info tab -- supplier_info view. #}
+{% load humanize %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="dt-card mb-3">
+            <h5 class="dt-card-title">Supplier Info</h5>
+            <table class="table mb-0">
+                <tbody>
+                    <tr>
+                        <th scope="row">Contact</th>
+                        <td>{{ supplier.contact_name|default:"—" }}{% if supplier.contact_title %}, {{ supplier.contact_title }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Address</th>
+                        <td>{{ supplier.formatted_address|default:"—" }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Phone</th>
+                        <td>{{ supplier.phone|default:"—" }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Homepage</th>
+                        <td>{{ supplier.homepage|default:"—" }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="dt-card mb-3">
+            <h5 class="dt-card-title">Sales Summary</h5>
+            <table class="table mb-0">
+                <tbody>
+                    <tr>
+                        <th scope="row">Products</th>
+                        <td class="text-end">{{ summary.product_count }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Orders</th>
+                        <td class="text-end">{{ summary.orders|intcomma }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Units Sold</th>
+                        <td class="text-end">{{ summary.units|intcomma }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Total Revenue</th>
+                        <td class="text-end">${{ summary.revenue|floatformat:2|intcomma }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

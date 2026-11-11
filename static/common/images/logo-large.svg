@@ -1,0 +1,9 @@
+<svg width="350" height="88" viewBox="0 0 350 88" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0.5" y="0.5" width="349" height="87" rx="16" fill="white" stroke="gainsboro"/>
+  <rect x="16" y="16" width="56" height="56" rx="12" fill="aliceblue"/>
+  <polygon points="24,26 24,62 44,44" fill="steelblue"/>
+  <polygon points="64,26 64,62 44,44" fill="goldenrod"/>
+  <text x="86" y="50" font-family="'Segoe UI', Tahoma, 'Trebuchet MS', sans-serif" font-size="34" font-weight="600" letter-spacing="-0.3">
+    <tspan fill="darkslategray">Django</tspan><tspan fill="steelblue">Traders</tspan>
+  </text>
+</svg>

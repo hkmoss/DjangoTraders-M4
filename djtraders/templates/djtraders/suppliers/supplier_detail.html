@@ -1,0 +1,64 @@
+<!--
+    Page shell for one supplier (supplier_detail view), built like
+    customer_detail.html: a tab control whose content is fetched by AJAX the
+    first time each tab is shown.
+      Info            -> _supplier_info.html, the default tab
+      Order History   -> _supplier_orders.html
+      Product Revenue -> _supplier_products.html
+-->
+{% extends "common/base.html" %}
+
+{% block title %}{{ supplier.company_name }}{% endblock %}
+
+{% block content %}
+    <div class="dt-navbar my-3">
+        <div class="d-flex align-items-center">
+            <h1 class="h4 mb-0">{{ supplier.company_name }}</h1>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs gap-2 mb-3" id="supplier-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link dt-tab dt-tab-supplier active" id="info-tab" type="button" role="tab"
+                    data-bs-toggle="tab" data-bs-target="#info-pane"
+                    aria-controls="info-pane" aria-selected="true"
+                    data-url="{% url 'djtraders:supplier_info' supplier.supplier_id %}">
+                <i class="fa-solid fa-address-card dt-tab-icon me-1"></i> Info
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link dt-tab dt-tab-order" id="orders-tab" type="button" role="tab"
+                    data-bs-toggle="tab" data-bs-target="#orders-pane"
+                    aria-controls="orders-pane" aria-selected="false"
+                    data-url="{% url 'djtraders:supplier_orders' supplier.supplier_id %}">
+                <i class="fa-solid fa-clock-rotate-left dt-tab-icon me-1"></i> Order History
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link dt-tab dt-tab-customer" id="products-tab" type="button" role="tab"
+                    data-bs-toggle="tab" data-bs-target="#products-pane"
+                    aria-controls="products-pane" aria-selected="false"
+                    data-url="{% url 'djtraders:supplier_products' supplier.supplier_id %}">
+                <i class="fa-solid fa-boxes-stacked dt-tab-icon me-1"></i> Product Revenue
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="info-pane" role="tabpanel"
+             aria-labelledby="info-tab" tabindex="0"></div>
+        <div class="tab-pane fade" id="orders-pane" role="tabpanel"
+             aria-labelledby="orders-tab" tabindex="0"></div>
+        <div class="tab-pane fade" id="products-pane" role="tabpanel"
+             aria-labelledby="products-tab" tabindex="0"></div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(function() {
+            ActivatePageTabs('#supplier-tabs');
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,71 @@
+<!--
+    The form page for editing a customer, reused to create one when new_customer is set. "form" is a
+    CustomerEditForm and the crispy tag renders its fields. With ?confirm_delete=1 the card shows an in-page
+    confirmation instead of the form. ValidateCustomerEditForm (customers.js) adds client-side checks; the real
+    validation stays server-side.
+-->
+
+{% extends "common/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if new_customer %}New Customer{% else %}Edit {{ customer.company_name }}{% endif %}{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="dt-card mt-4">
+                <h5 class="dt-card-title">
+                    {% if new_customer %}
+                        <i class="fa-solid fa-user-plus dt-icon"></i>
+                        New Customer
+                    {% else %}
+                        <i class="fa-solid fa-pen-to-square dt-icon"></i>
+                        Edit {{ customer.company_name }}
+                    {% endif %}
+                </h5>
+                {% if confirm_delete %}
+                    <!-- The "are you sure" question is part of the page, not a browser confirm() dialog. -->
+                    <div class="alert alert-danger">
+                        <h5 class="alert-heading">
+                            <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                            Deactivate {{ customer.company_name }}?
+                        </h5>
+                        <div class="mb-3">
+                            This marks the customer inactive as of today -- it does not
+                            delete their record or their order history, and can be
+                            reversed later by clearing their inactive date.
+                        </div>
+                        <div class="d-flex">
+                            <form method="post"
+                                  action="{% url 'djtraders:customer_delete' customer.customer_id %}">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="btn btn-outline-danger bg-white text-black dt-hover-shadow"
+                                        title="Confirm deactivation">
+                                    <i class="fa-solid fa-user-slash me-1"></i>
+                                    Yes, Deactivate
+                                </button>
+                            </form>
+                            <div class="dt-link-wrap btn dt-btn-secondary-customer dt-hover-shadow">
+                                <a href="{% url 'djtraders:customer_detail' customer.customer_id %}"
+                                   title="Cancel">
+                                    <i class="fa-solid fa-xmark me-1"></i>
+                                    Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    {% crispy form %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // Listens on #customer-edit-form only, so this is safe on the confirmation branch too (its form has no such id).
+        ValidateCustomerEditForm('#customer-edit-form');
+    </script>
+{% endblock %}

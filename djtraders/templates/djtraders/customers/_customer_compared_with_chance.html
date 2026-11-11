@@ -1,0 +1,35 @@
+{# Compared With Chance card: the real pairs (chance.real) beside the same method run on shuffled orders (chance.shuffled), to show how much of the pattern is more than chance. #}
+{% load humanize %}
+<div class="dt-card h-100">
+    <h5 class="dt-card-title">Compared With Chance</h5>
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Pairs</th>
+                <th class="text-end">Real orders</th>
+                <th class="text-end" title="The average of {{ chance.shuffles }} shuffles of the same orders">Shuffled orders</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>In at least {{ min_orders }} orders</td>
+                <td class="text-end">{{ chance.real.pairs|intcomma }}</td>
+                <td class="text-end">{{ chance.shuffled.pairs|intcomma }}</td>
+            </tr>
+            <tr>
+                <td>In at least {{ chance.strong_orders }} orders</td>
+                <td class="text-end">{{ chance.real.strong_pairs|intcomma }}</td>
+                <td class="text-end">{{ chance.shuffled.strong_pairs|intcomma }}</td>
+            </tr>
+            <tr>
+                <td>Most orders for one pair</td>
+                <td class="text-end">{{ chance.real.top_orders|intcomma }}</td>
+                <td class="text-end">{{ chance.shuffled.top_orders|intcomma }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="dt-subtle">
+        <strong>Method:</strong> a shuffle test: the same pair counting on randomly dealt orders. Code: <code>recommendations.py</code>, <code>chance_comparison()</code>.
+        Shuffling keeps the size of every order and how popular each product is, and deals the products out at random, so any pair it finds is there by chance. The further the real column is above the shuffled one, the more the pairs reflect how customers really buy. The shuffled figures are the average of {{ chance.shuffles }} shuffles.
+    </div>
+</div>

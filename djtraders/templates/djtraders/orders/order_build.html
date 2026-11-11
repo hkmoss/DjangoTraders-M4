@@ -1,0 +1,169 @@
+<!--
+    The shopping cart page (order_build view). No Order row exists until commit: the cart is request.session["cart"],
+    which _cart_lines (views/orders.py) turns into display-ready lines. Cart Items is a plain table because JS adds and
+    replaces rows. The Add to Cart card is its own partial; AddOrderLineItem (orders.js) submits it by AJAX. Commit
+    (order_commit) is a separate POST and the only point where anything here is written to the database.
+-->
+{% extends "common/base.html" %}
+{% load humanize %}
+
+{% block title %}Cart -- {{ customer.company_name }}{% endblock %}
+
+{% block content %}
+    <div class="dt-navbar my-3">
+        <div class="d-flex align-items-center">
+            <h1 class="h4 mb-0">Your Cart -- {{ customer.company_name }}</h1>
+        </div>
+        <div class="dt-link-wrap btn dt-btn-secondary-customer dt-hover-shadow">
+            <a href="{% url 'djtraders:customer_detail' customer.customer_id %}" title="Back to Customer">
+                <i class="fa-solid fa-arrow-left me-1"></i>
+                Back to Customer
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="dt-card mb-3">
+                <div class="dt-card-header">
+                    <h5>Cart Items</h5>
+                    <!-- Clear Cart is one click with no confirm step, like each row's Remove button. -->
+                    <form method="post" action="{% url 'djtraders:order_clear_cart' customer.customer_id %}" class="mb-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm dt-btn-secondary-customer dt-hover-shadow" title="Clear cart">
+                            <i class="fa-solid fa-trash-can me-1"></i>Clear Cart
+                        </button>
+                    </form>
+                </div>
+                <table id="order-lines-table" class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Quantity</th>
+                            <th class="text-end">Discount</th>
+                            <th class="text-end">Line Total</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-lines-body">
+                        {% for line in cart_lines %}
+                            {% include "djtraders/orders/_order_line_row.html" with customer_id=customer.customer_id %}
+                        {% empty %}
+                            <tr id="order-lines-empty-row">
+                                <td colspan="6">Your cart is empty -- add a product below.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="4" class="text-end">Order Total</th>
+                            <th id="order-total" class="text-end">${{ cart_total|floatformat:2|intcomma }}</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            {% include "djtraders/orders/_order_add_card.html" %}
+        </div>
+
+        <div class="col-md-4">
+            <div class="dt-card mb-3">
+                <h5 class="dt-card-title">Place Order</h5>
+                {% if commit_form.non_field_errors %}
+                    <div class="alert alert-danger">{{ commit_form.non_field_errors }}</div>
+                {% endif %}
+                {% if stock_errors %}
+                    <!-- order_commit's stock re-check refused the order; the cart is untouched, so fix a quantity and commit again. -->
+                    <div class="alert alert-danger">
+                        {% for stock_error in stock_errors %}
+                            <div>{{ stock_error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <form method="post" action="{% url 'djtraders:order_commit' customer.customer_id %}">
+                    {% csrf_token %}
+                    <!-- Three sections share one form, so a single POST submits every field. -->
+                    <div class="mb-2 fw-bold">Ship To</div>
+                    <div class="mb-3">
+                        <label for="{{ commit_form.ship_name.id_for_label }}" class="form-label">Name</label>
+                        {{ commit_form.ship_name }}
+                        {% if commit_form.ship_name.errors %}
+                            <div class="text-danger small">{{ commit_form.ship_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <hr>
+                    <div class="mb-2 fw-bold">Shipping Address</div>
+                    <div class="mb-3">
+                        <label for="{{ commit_form.ship_address.id_for_label }}" class="form-label">Address</label>
+                        {{ commit_form.ship_address }}
+                        {% if commit_form.ship_address.errors %}
+                            <div class="text-danger small">{{ commit_form.ship_address.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ commit_form.ship_city.id_for_label }}" class="form-label">City</label>
+                            {{ commit_form.ship_city }}
+                            {% if commit_form.ship_city.errors %}
+                                <div class="text-danger small">{{ commit_form.ship_city.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ commit_form.ship_region.id_for_label }}" class="form-label">Region</label>
+                            {{ commit_form.ship_region }}
+                        </div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ commit_form.ship_postal_code.id_for_label }}" class="form-label">Postal Code</label>
+                            {{ commit_form.ship_postal_code }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ commit_form.ship_country.id_for_label }}" class="form-label">Country</label>
+                            {{ commit_form.ship_country }}
+                            {% if commit_form.ship_country.errors %}
+                                <div class="text-danger small">{{ commit_form.ship_country.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-2 fw-bold">Order Handling</div>
+                    <div class="mb-3">
+                        <label for="{{ commit_form.employee.id_for_label }}" class="form-label">Employee <span class="text-danger small">(required)</span></label>
+                        {{ commit_form.employee }}
+                        {% if commit_form.employee.errors %}
+                            <div class="text-danger small">{{ commit_form.employee.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ commit_form.required_date.id_for_label }}" class="form-label">Required Date</label>
+                        {{ commit_form.required_date }}
+                        {% if commit_form.required_date.errors %}
+                            <div class="text-danger small">{{ commit_form.required_date.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ commit_form.shipped_date.id_for_label }}" class="form-label">Ship-By Date</label>
+                        {{ commit_form.shipped_date }}
+                        {% if commit_form.shipped_date.errors %}
+                            <div class="text-danger small">{{ commit_form.shipped_date.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn dt-btn-primary-customer dt-hover-shadow w-100" title="Place this order">
+                        <i class="fa-solid fa-check me-1"></i>Commit Order
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(function() {
+            AddOrderLineItem('#order-detail-form');
+        });
+    </script>
+{% endblock %}

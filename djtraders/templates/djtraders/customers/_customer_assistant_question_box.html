@@ -1,0 +1,44 @@
+{# Ask the Assistant card: the question box. The catalog beside it fills the box or runs a tool. #}
+<div class="dt-card">
+    <h5 class="dt-card-title">Ask the Assistant</h5>
+
+    <form id="ask-form" method="post" action="{% url 'djtraders:customer_ask_answer' customer.customer_id %}">
+        {% csrf_token %}
+        <label for="ask-question" class="form-label">
+            {% if role == "employee" %}
+                Ask about {{ customer.company_name }}. 
+                "You" and "your" in the answers mean this customer.
+            {% else %}
+            Ask about your own orders, or try an example from the list.
+            {% endif %}
+        </label>
+        <div class="d-flex gap-2">
+            <input type="text" id="ask-question" name="question" class="form-control"
+                   maxlength="{{ max_length }}" required autocomplete="off"
+                   placeholder="Type a question, or pick a tool from the list">
+
+            <button type="submit" class="btn dt-btn-primary-customer dt-hover-shadow" title="Ask the assistant">
+                <i class="fa-solid fa-paper-plane me-1"></i>
+                Ask
+            </button>
+        </div>
+    </form>
+    <div id="ask-error" class="text-danger small mt-2" role="alert"></div>
+    
+    <div class="d-flex align-items-start gap-2 mt-2">
+        <div class="dt-subtle flex-grow-1">
+            The assistant keeps track of your last {{ history_length }} questions on a rotating basis, so you can ask a follow-up.
+        </div>
+        <button type="button" id="ask-new" class="btn btn-sm dt-btn-secondary-customer dt-hover-shadow flex-shrink-0"
+                data-url="{% url 'djtraders:customer_ask_new' customer.customer_id %}" title="Forget the earlier questions and start over">
+            <i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i>New conversation
+        </button>
+    </div>
+    <div class="dt-subtle mt-2">
+        The assistant uses the tools your question needs, or the one you click, and shows every stage
+        of the process.
+        {% if role != "employee" %} 
+            It can only see your own orders.
+        {% endif %}
+    </div>
+</div>

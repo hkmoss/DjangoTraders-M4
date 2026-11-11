@@ -1,0 +1,27 @@
+{# Revenue breakdown: a manager sees every group's revenue; everyone else sees their own share of each group's revenue. #}
+<div class="dt-card h-100">
+    <h5 class="dt-card-title">Revenue Breakdown</h5>
+    <div class="dt-controls">
+        {% include "djtraders/employees/_top_radios.html" with name="breakdown-top" %}
+        {% include "djtraders/employees/_chart_kind.html" with name="breakdown-kind" allow_pie=viewer_is_manager %}
+        <div class="dt-control-group">
+            <label for="breakdown-by" class="fw-bold mb-0">Revenue by</label>
+            <select id="breakdown-by"
+                    class="form-select w-auto"
+                    data-url="{% url 'djtraders:employee_breakdown_chart' employee.employee_id %}">
+                <option value="supplier" selected>Supplier</option>
+                <option value="product">Product</option>
+                <option value="category">Category</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="text-muted small">
+        {% if viewer_is_manager %}
+            As a manager you see revenue across all orders; each bar shows its dollars and its percentage of all revenue.
+        {% else %}
+            Each bar is the percentage of that supplier's, product's or category's total revenue that came from your orders.
+        {% endif %}
+    </div>
+    <div id="dashboard-breakdown">{{ breakdown_plot|safe }}</div>
+</div>

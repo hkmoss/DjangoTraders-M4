@@ -1,0 +1,11 @@
+{# Partial for the Ask tab -- customer_ask_answer and customer_ask_write views. Two slots: the answer goes into #ask-answer and the pipeline into #ask-pipeline (ShowAnswer in agent.js splits them). An answer the language model wrote (result.agent) gets the agent's Tool Calls card; a button's answer gets the six stages, and The AI's text when the model explained or drafted from it. #}
+<div data-slot="answer">
+    {% include "djtraders/customers/_customer_answer.html" %}
+</div>
+<div data-slot="pipeline">
+    {% if result.agent %}
+        {% include "djtraders/customers/_customer_assistant_agent_calls.html" with agent=result.agent %}
+    {% else %}
+        {% include "djtraders/customers/_customer_assistant_tool_calls.html" %}
+    {% endif %}
+</div>

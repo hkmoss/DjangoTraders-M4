@@ -1,0 +1,13 @@
+{# Who wrote one message sent to the model, for the Tool Calls card. message is one chat-completions message: system (our instructions), user (the question), assistant (the model's earlier reply, here a request for tools) or tool (a tool's result). #}
+{% if message.role == "system" %}
+    <span class="dt-actor dt-actor-code">Our code</span> <strong>The instructions</strong> <span class="dt-subtle">(written by us, in planner.py or call_brief.py)</span>
+{% elif message.role == "user" %}
+    <span class="dt-actor dt-actor-you">You</span> <strong>The question</strong>
+{% elif message.role == "assistant" and message.tool_calls %}
+    <span class="dt-actor dt-actor-ai">AI</span> <strong>The model asked for</strong>
+    {% for call in message.tool_calls %}<code>{{ call.function.name }}</code>{% if not forloop.last %}, {% endif %}{% endfor %}
+{% elif message.role == "assistant" %}
+    <span class="dt-actor dt-actor-ai">AI</span> <strong>An earlier answer</strong> <span class="dt-subtle">(sent again by our code; the model keeps no memory)</span>
+{% elif message.role == "tool" %}
+    <span class="dt-actor dt-actor-code">Our code</span> <strong>A tool's result</strong> <span class="dt-subtle">(computed by our Python code, then sent to the model)</span>
+{% endif %}

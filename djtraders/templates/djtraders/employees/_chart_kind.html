@@ -1,0 +1,9 @@
+{# Chart type dropdown (Bar, Column, Pie). The including template passes name, which becomes the select's id, and allow_pie to offer the Pie option. #}
+<div class="dt-control-group">
+    <label for="{{ name }}" class="fw-bold mb-0">Chart</label>
+    <select id="{{ name }}" class="form-select w-auto">
+        <option value="bar" selected>Bar</option>
+        <option value="column">Column</option>
+        {% if allow_pie %}<option value="pie">Pie</option>{% endif %}
+    </select>
+</div>

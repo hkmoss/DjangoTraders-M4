@@ -1,0 +1,13 @@
+{# Partial (no base.html) for the Dashboard tab -- customer_dashboard view. #}
+{% if annual_plot %}
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            {% include "djtraders/customers/_customer_revenue_by_year.html" %}
+        </div>
+        <div class="col-lg-6">
+            {% include "djtraders/customers/_customer_revenue_by_month.html" %}
+        </div>
+    </div>
+{% else %}
+    <div class="dt-subtle">This customer has no placed orders to chart yet.</div>
+{% endif %}
