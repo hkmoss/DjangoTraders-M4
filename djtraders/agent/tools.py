@@ -499,7 +499,7 @@ def _similarity_details(company_name):
     return [
         ("Method", "cosine similarity between customers' product counts (machine learning, unsupervised)"),
         ("Customers compared", f"the {len(nearest)} nearest to this customer"),
-        ("Their similarity", f"{nearest[-1]:.2f} to {nearest[0]:.2f}, where 1 is the same mix of products"),
+        ("Their similarity", f"{nearest[-1]:.2f} to {nearest[0]:.2f}, on a scale from 0 to 1, where 1 means identical purchasing patterns and 0 means no similarity. Higher values indicate customers whose purchasing histories are more alike."),
     ]
 
 
@@ -530,10 +530,11 @@ def customers_like_this_one(customer, arguments):
         )
 
     return ToolResult(
-        f"{len(frame)} products are bought by customers with similar purchasing patterns. "
-        "Products are ordered by how many similar customers bought them; ties are broken by rarity, "
-        "so products bought by fewer customers overall come first. These are patterns to try, "
-        "not guarantees of what this customer will buy.",
+        f"There are {len(frame)} products bought by customers with similar purchasing patterns. "
+        "Products are ordered by how many similar customers bought them. When two products are bought by the same number of similar customers, "
+        "the product purchased by fewer customers overall is shown first because it provides stronger evidence of a meaningful purchasing pattern. "
+        "These suggestions may be useful, " 
+        "but they are not guarantees of what this customer will buy.",
         columns=[
             ("Product", "text"),
             ("Bought By", "text"),
@@ -613,15 +614,15 @@ def slowing_customers(customer, arguments):
     frame = frame.sort_values("overdue", ascending=False).head(10)
 
     return ToolResult(
-    f"{len(frame)} customers are ordering less often than their usual pattern. "
-    "Customers are ordered by how many usual gaps have passed since their last order. "
-    "The usual gap is a guide to who to call, not a forecast.",
+    f"The {len(frame)} customers below may benefit from follow-up because they have gone longer than usual since their last order. "
+    "Customers are ranked by how many typical gaps have passed since their last order. "
+    "The usual gap is the customer's typical number of days between orders and is a guide for who to contact, not a forecast.",
     columns=[
         ("Customer", "text"),
         ("Orders", "number"),
-        ("Usual Gap", "number"),
-        ("Days Since Last", "number"),
-        ("Gaps Overdue", "number"),
+        ("Usual Gap Between Orders", "number"),
+        ("Days Since Last Order", "number"),
+        ("Typical Order Gaps Overdue", "number"),
     ],
     rows=[
         [
