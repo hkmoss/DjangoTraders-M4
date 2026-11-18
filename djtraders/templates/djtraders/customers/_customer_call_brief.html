@@ -1,0 +1,46 @@
+<!--
+    Call Brief tab (customer_call_brief view).
+
+     Loaded by AJAX when the Call Brief tab is selected.
+-->
+
+<div class="card shadow-sm">
+    <div class="card-body">
+
+        <h3 class="card-title mb-3">
+            <i class="fa-solid fa-phone me-2"></i>
+            Prepare Me for a Call
+        </h3>
+
+        <p>
+            <strong>Customer:</strong>
+            {{ customer.company_name }}
+            ({{ customer.customer_id }})
+        </p>
+
+        <p class="text-muted">
+            Generate a briefing before contacting this customer.
+        </p>
+
+        <form id="ask-form">
+            {% csrf_token %}
+        </form>
+
+        <button
+            type="button"
+            class="ask-tool"
+            data-tool="prepare_me_for_a_call"
+            data-url="{% url 'djtraders:customer_ask_answer' customer.customer_id %}">
+            Generate Call Brief
+        </button>
+
+        <div id="ask-error" class="text-danger mt-2"></div>
+
+        <hr>
+
+        <div id="ask-answer"></div>
+
+        <div id="ask-pipeline"></div>
+
+    </div>
+</div>

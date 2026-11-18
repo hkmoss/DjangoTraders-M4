@@ -32,6 +32,46 @@ def asking_role(request):
     """"employee" when an employee is logged in, otherwise "customer": the role whose tools the assistant may use."""
     return "employee" if request.session.get("current_user") else "customer"
 
+def customer_call_brief(request, customer_id):
+    if customer_access_denied(request, customer_id):
+        return HttpResponse(status=403)
+
+    customer = get_object_or_404(Customer, pk=customer_id)
+
+    context = {
+        "customer": customer,
+    }
+
+    return render(
+        request,
+        "djtraders/customers/_customer_call_brief.html",
+        context,
+    )
+
+def customer_call_brief_answer(request, customer_id):
+    if customer_access_denied(request, customer_id):
+        return HttpResponse(status=403)
+
+    customer = get_object_or_404(Customer, pk=customer_id)
+
+    outcome = answer_button(
+        customer,
+        "prepare_me_for_a_call",
+        asking_role(request),
+        {},
+    )
+
+    outcome.update({
+        "customer": customer,
+        "question": "(button) prepare_me_for_a_call",
+        "role": asking_role(request),
+    })
+
+    return render(
+        request,
+        "djtraders/customers/_customer_assistant_answer.html",
+        outcome,
+    )
 
 # region Ask tab (on the Customer Detail page)
 def customer_ask(request, customer_id):

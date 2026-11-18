@@ -96,6 +96,13 @@ customer_pairs_chart_url = path(
 customer_ask_url = path(
     "customers/<str:customer_id>/ask/", agent.customer_ask, name="customer_ask",
 )
+customer_call_brief_url = path(
+    "customers/<str:customer_id>/call-brief/", agent.customer_call_brief, name="customer_call_brief",
+)
+customer_call_brief_answer_url = path(
+    "customers/<str:customer_id>/call-brief/answer/", agent.customer_call_brief_answer, name="customer_call_brief_answer",
+)
+
 customer_ask_answer_url = path(
     "customers/<str:customer_id>/ask/answer/",
     agent.customer_ask_answer, name="customer_ask_answer",
@@ -120,7 +127,6 @@ customer_orders_url = path(
     "customers/<str:customer_id>/orders/",
     customers.customer_orders, name="customer_orders",
 )
-
 order_create_url = path(
     "customers/<str:customer_id>/orders/create/", orders.order_create, name="order_create"
 )
@@ -273,6 +279,8 @@ urlpatterns = [
     customer_recommendations_url,
     customer_pairs_chart_url,
     customer_ask_url,
+    customer_call_brief_url,
+    customer_call_brief_answer_url,
     customer_ask_answer_url,
     customer_ask_write_url,
     customer_ask_new_url,
