@@ -1,7 +1,7 @@
 <!--
     Call Brief tab (customer_call_brief view).
 
-     Loaded by AJAX when the Call Brief tab is selected.
+    Loaded by AJAX when the Call Brief tab is selected.
 -->
 
 <div class="card shadow-sm">
@@ -12,15 +12,21 @@
             Prepare Me for a Call
         </h3>
 
-        <p>
-            <strong>Customer:</strong>
-            {{ customer.company_name }}
-            ({{ customer.customer_id }})
-        </p>
+        <div class="mb-3">
+            <div>
+                <strong>Customer:</strong>
+                {{ customer.company_name }}
+                ({{ customer.customer_id }})
+            </div>
 
-        <p class="text-muted">
-            Generate a briefing before contacting this customer.
-        </p>
+            <div><strong>Contact:</strong> {{ customer.contact_name }}{% if customer.contact_title %}, {{ customer.contact_title }}{% endif %}</div>
+
+            <div>
+                <strong>Phone:</strong>
+                <a href="tel:{{ customer.phone }}">{{ customer.phone }}</a>
+            </div>
+        </div>
+
 
         <form id="ask-form">
             {% csrf_token %}

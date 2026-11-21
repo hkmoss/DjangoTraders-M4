@@ -59,7 +59,7 @@ CALL_BRIEF_TOOLS = [
 
 
 # The question sent with the instructions when the button is pressed.
-CALL_BRIEF_QUESTION = "Prepare me for a call with this customer."
+CALL_BRIEF_QUESTION = "Prepare me for a call with this customer. Begin with the customer's most recent order. Then identify products worth discussing and why they may be relevant. "
 
 
 def prepare_call_brief(customer, arguments=None):
