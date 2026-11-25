@@ -19,33 +19,29 @@ from .tools import ToolResult
 # employee about to phone this customer), what it contains, how long it may be, and the rules the
 # customer-side instructions use (only facts from the tools, no number or product name that is not in
 # them, no arithmetic). The customer-side tools say "your orders": say what "you" means in a tool result.
-CALL_BRIEF_INSTRUCTIONS = """
-You are preparing a call brief for a sales employee who is about to phone the customer whose page is open.
 
-Write a concise brief of no more than 200 words.
+CALL_BRIEF_INSTRUCTIONS = (
+    "You are preparing a brief for an employee who is about to phone this customer. "
+    "Before writing the brief, call my_recent_orders, customers_like_this_one, and "
+    "suggest_for_customer. Use information from all three tools in the brief. "
+    "Then write a short brief of no more than 300 words as a narrative paragraph for the "
+    "employee. Summarize the customer's recent ordering activity instead of listing "
+    "products. Mention individual products only when they are important to a reorder "
+    "opportunity or a recommendation. Identify any products that may be due for reorder "
+    "and discuss up to three products that may be appropriate to suggest. For each "
+    "suggested product included in the brief, explain in a complete sentence why it was "
+    "recommended using facts returned by the tools. Do not include a suggested product "
+    "without an explanation. Include any unusual or useful patterns returned by the "
+    "tools. Use only facts from the tools, using only the numbers and product names they "
+    "returned, with no arithmetic of your own. Write the entire brief as a narrative "
+    "paragraph of complete sentences. Every product mention must appear within a sentence. "
+    "Never present products as a list, table, heading, label, or fragment. Do not use "
+    "bullet points, numbered lists, or headings. In the tool results, 'you' and 'your' "
+    "refer to the customer, so write about the customer, not to them."
+)
 
-Use the available tools to gather information before writing. Include:
-
-- A short summary of the customer's recent ordering activity.
-- Products that may be appropriate to suggest to the customer.
-- Helpful observations from customers_like_this_one when they may support additional sales opportunities.
-
-Write for the employee, not for the customer.
-
-Use complete sentences and a professional business tone.
-
-Important rules:
-
-- Use only facts returned by the tools.
-- Do not invent products, quantities, dates, trends, explanations, or recommendations.
-- Do not perform arithmetic.
-- Do not include a product name unless it appears in a tool result.
-- Do not include a number unless it appears in a tool result.
-- If information is unavailable, simply say so.
-- Suggestions are opportunities to discuss with the customer, not predictions or guarantees.
-
-Some tools refer to "your orders". In tool results, "you" refers to the customer whose page is open, not the employee reading the brief.
-"""
+EMPLOYEE_NOTE = (" The person asking is an employee looking at this customer's page: in the tool results, "
+                 "'you' and 'your' mean the customer, so write about the customer, not to them.")
 
 
 # TODO (Assignment 4): the names of the tools the model may call, for example "my_recent_orders".
@@ -59,7 +55,7 @@ CALL_BRIEF_TOOLS = [
 
 
 # The question sent with the instructions when the button is pressed.
-CALL_BRIEF_QUESTION = "Prepare me for a call with this customer. Begin with the customer's most recent order. Then identify products worth discussing and why they may be relevant. "
+CALL_BRIEF_QUESTION = "Prepare me for a call with this customer." 
 
 
 def prepare_call_brief(customer, arguments=None):

@@ -537,9 +537,9 @@ def customers_like_this_one(customer, arguments):
         "but they are not guarantees of what this customer will buy.",
         columns=[
             ("Product", "text"),
-            ("Bought By", "text"),
-            ("Similar Customers", "percent"),
-            ("All Customers", "percent"),
+            ("# of Similar Customers Who Bought This", "text"),
+            ("% of Similar Customers Who Bought This", "percent"),
+            ("% of All Customers Who Bought This", "percent"),
         ],
         rows=[
             [
