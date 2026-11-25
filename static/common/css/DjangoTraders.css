@@ -511,6 +511,51 @@ td form + form {
 .dt-ask-working {
   color: #555;
   font-style: italic;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Assignment 4 - Requirement 3 Loader
+   ========================================================================== */
+
+.dt-loader {
+
+ width: 30px;
+
+ aspect-ratio: 1;
+
+ display: inline-block;
+
+ --c: no-repeat linear-gradient(var(--dt-supplier) 0 0);
+
+ background:
+ var(--c) 0 0,
+ var(--c) 0 100%,
+ var(--c) 50% 50%,
+ var(--c) 100% 0,
+ var(--c) 100% 100%;
+
+ animation: dt-bars 1s infinite alternate;
+
+}
+
+@keyframes dt-bars {
+    0%, 10% {
+        background-size: 20% 100%;
+    }
+
+    50% {
+        background-size: 20% 20%;
+    }
+
+    90%, 100% {
+        background-size: 100% 20%;
+    }
+}
+
+.dt-ask-working-message {
+    margin-top: 0.75rem;
+    font-style: italics;
 }
 
 /* Who did each stage of an answer: you, the AI (the language model) or our code. */
@@ -560,4 +605,5 @@ mark.dt-not-found {
   background-color: #ffd966;
   color: #5c4400;
 }
+
 

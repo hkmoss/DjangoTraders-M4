@@ -36,10 +36,26 @@ function ActivateAskBox($pane) {
      * from a second to half a minute. ShowAnswer or ShowAskError replaces it.
      */
     function ShowWorking() {
+
         $pane.find("#ask-error").text("");
-        $pane.find("#ask-answer").empty().append(
-            $("<div>").addClass("dt-card dt-ask-working").attr("role", "status").text("The assistant is working…")
+
+        const $working = $("<div>")
+            .addClass("dt-card dt-ask-working")
+            .attr("role", "status");
+
+        $working.append(
+            $("<div>").addClass("dt-loader")
         );
+
+        $working.append(
+            $("<div>")
+                .addClass("dt-ask-working-message")
+                .text("Preparing the brief...")
+        );
+
+        $pane.find("#ask-answer")
+            .empty()
+            .append($working);
     }
 
     /** Clears the working line and shows the server's message under the box (a 400) or a fallback when it cannot be reached. */
