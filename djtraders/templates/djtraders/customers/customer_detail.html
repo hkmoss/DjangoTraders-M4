@@ -88,33 +88,40 @@
             </button>
         </li>
         {% if can_ask %}
-            <li class="nav-item" role="presentation">
-                <button class="nav-link dt-tab dt-tab-supplier"
-                        id="ask-tab"
-                        type="button"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#ask-pane"
-                        aria-controls="ask-pane"
-                        aria-selected="false"
-                        data-url="{% url 'djtraders:customer_ask' customer.customer_id %}">
-                    <i class="fa-solid fa-comments dt-tab-icon me-1"></i> Ask
-                </button>
-            </li>
 
-            <li class="nav-item" role="presentation">
-                <button class="nav-link dt-tab dt-tab-supplier"
-                        id="call-brief-tab"
-                        type="button"
-                        role="tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#call-brief-pane"
-                        aria-controls="call-brief-pane"
-                        aria-selected="false"
-                        data-url="{% url 'djtraders:customer_call_brief' customer.customer_id %}">
-                    <i class="fa-solid fa-phone dt-tab-icon me-1"></i> Call Brief
-                </button>
-            </li>
+        <li class="nav-item" role="presentation">
+        <button class="nav-link dt-tab dt-tab-supplier"
+        id="ask-tab"
+        type="button"
+        role="tab"
+        data-bs-toggle="tab"
+        data-bs-target="#ask-pane"
+        aria-controls="ask-pane"
+        aria-selected="false"
+        data-url="{% url 'djtraders:customer_ask' customer.customer_id %}">
+        <i class="fa-solid fa-comments dt-tab-icon me-1"></i> Ask
+        </button>
+        </li>
+
+        {% endif %}
+
+
+        {% if current_employee %}
+
+        <li class="nav-item" role="presentation">
+        <button class="nav-link dt-tab dt-tab-supplier"
+        id="call-brief-tab"
+        type="button"
+        role="tab"
+        data-bs-toggle="tab"
+        data-bs-target="#call-brief-pane"
+        aria-controls="call-brief-pane"
+        aria-selected="false"
+        data-url="{% url 'djtraders:customer_call_brief' customer.customer_id %}">
+        <i class="fa-solid fa-phone dt-tab-icon me-1"></i> Call Brief
+        </button>
+        </li>
+
         {% endif %}
     </ul>
     <div class="tab-content">
@@ -139,16 +146,20 @@
              aria-labelledby="orders-tab"
              tabindex="0"></div>
         {% if can_ask %}
-            <div class="tab-pane fade"
-                 id="ask-pane"
-                 role="tabpanel"
-                 aria-labelledby="ask-tab"
-                 tabindex="0"></div>
-            <div class="tab-pane fade"
-                 id="call-brief-pane"
-                 role="tabpanel"
-                 aria-labelledby="call-brief-tab"
-                 tabindex="0"></div>
+        <div class="tab-pane fade"
+        id="ask-pane"
+        role="tabpanel"
+        aria-labelledby="ask-tab"
+        tabindex="0"></div>
+        {% endif %}
+
+
+        {% if current_employee %}
+        <div class="tab-pane fade"
+        id="call-brief-pane"
+        role="tabpanel"
+        aria-labelledby="call-brief-tab"
+        tabindex="0"></div>
         {% endif %}
     </div>
 {% endblock %}
